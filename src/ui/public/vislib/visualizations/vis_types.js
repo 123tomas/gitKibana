@@ -13,8 +13,10 @@ define(function (require) {
       histogram: Private(require('ui/vislib/visualizations/column_chart')),
       pie: Private(require('ui/vislib/visualizations/pie_chart')),
       line: Private(require('ui/vislib/visualizations/line_chart')),
+	  chord: Private(require('ui/vislib/visualizations/chord_chart')),
       area: Private(require('ui/vislib/visualizations/area_chart')),
-      tile_map: Private(require('ui/vislib/visualizations/tile_map'))
+      tile_map: Private(require('ui/vislib/visualizations/tile_map')),
+	  relation: Private(require('ui/vislib/visualizations/relation_chart'))
     };
   };
 });

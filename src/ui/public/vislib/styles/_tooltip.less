@@ -81,3 +81,26 @@
   top: -500px;
   left: -500px;
 }
+
+.tooltip-relation {	
+  line-height: 1.1;
+  font-size: 12px;
+  font-weight: normal;
+  background: @tooltip-bg;
+  color: @tooltip-color;
+  border-radius: 4px;
+  position: fixed;
+  z-index: 120;
+  word-wrap: break-word;
+  max-width: 40%;
+  overflow: hidden;
+  pointer-events: none;
+  
+  > :last-child {
+    margin-bottom: @tooltip-space;
+  }
+
+  > * {
+    margin: @tooltip-space @tooltip-space 0;
+  }
+}

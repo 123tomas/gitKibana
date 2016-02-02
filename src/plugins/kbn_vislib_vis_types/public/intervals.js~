@@ -1,0 +1,66 @@
+define(function (require) {
+  return function IntervalsVisType(Private) {
+    var VislibVisType = Private(require('ui/vislib_vis_type/VislibVisType'));
+    var Schemas = Private(require('ui/Vis/Schemas'));
+
+    return new VislibVisType({
+      name: 'intervals',
+      title: 'Interval chart',
+      icon: 'fa-clock-o ',
+      description: 'This chart can visualize your data which have start and end date',
+      params: {
+        defaults: {
+          shareYAxis: true,
+          addTooltip: true,
+          addLegend: true,
+          scale: 'linear',
+          mode: 'stacked',
+          times: [],
+          addTimeMarker: false,
+          defaultYExtents: false,
+          setYExtents: false,
+          yAxis: {}
+        },
+        scales: ['linear', 'log', 'square root'],
+        modes: ['stacked', 'percentage', 'grouped'],
+        editor: require('plugins/kbn_vislib_vis_types/editors/intervals.html')
+      },
+      schemas: new Schemas([
+        {
+          group: 'metrics',
+          name: 'metric',
+          title: 'Y-Axis',
+          min: 1,
+          aggFilter: '!std_dev',
+          defaults: [
+            { schema: 'metric', type: 'count' }
+          ]
+        },
+        {
+          group: 'buckets',
+          name: 'segment',
+          title: 'X-Axis',
+          min: 0,
+          max: 1,
+          aggFilter: '!geohash_grid'
+        },
+        {
+          group: 'buckets',
+          name: 'group',
+          title: 'Split Bars',
+          min: 0,
+          max: 1,
+          aggFilter: '!geohash_grid'
+        },
+        {
+          group: 'buckets',
+          name: 'split',
+          title: 'Split Chart',
+          min: 0,
+          max: 1,
+          aggFilter: '!geohash_grid'
+        }
+      ])
+    });
+  };
+});

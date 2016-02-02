@@ -88,7 +88,6 @@ define(function (require) {
         min: Infinity,
         max: -Infinity
       });
-
       var radiusStep = ((radii.max - radii.min) || (radii.max * 100)) / Math.pow(this._attr.radiusRatio, 2);
 
       var layer = svg.selectAll('.points')
