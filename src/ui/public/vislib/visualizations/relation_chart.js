@@ -192,7 +192,7 @@ define(function (require) {
         row.forEach(function (datas) {
           nodes.push(datas.x);
           nodes.push(datas.label);
-		  self.toUnique(nodes);
+          self.toUnique(nodes);
           links.push({source:datas.x,target:datas.label,count:datas.y});
         });
       });

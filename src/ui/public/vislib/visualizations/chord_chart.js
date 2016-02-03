@@ -83,8 +83,8 @@ define(function (require) {
       var destinationValues = [];
       var sourceValuesHelp = [];
       var destinationValuesHelp = [];
-	  var i = 0;
-	  var j = 0;
+      var i = 0;
+      var j = 0;
 
       //parsing data to links and values
       data.forEach(function (arrayOfLinks) {
@@ -119,7 +119,7 @@ define(function (require) {
         });
         i++;
       });
-      
+
       var index1;
       var index2;
 
