@@ -7,7 +7,7 @@ define(function () {
      * For example, if the data has rows, it returns the same number of
      * `.chart` elements as row objects.
      */
-	return function split(selection) {
+    return function split(selection) {
       selection.each(function (data) {
         var div = d3.select(this)
         .attr('class', function () {

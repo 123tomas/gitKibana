@@ -9,14 +9,14 @@ define(function (require) {
      * are all nearly the same minus a few details
      */
     return function (vis) {
-        var data;
+      var data;
 
-        data = new Data(vis.data, vis._attr);
+      data = new Data(vis.data, vis._attr);
 
-        return new Handler(vis, {
-          data: data,
-        });
+      return new Handler(vis, {
+        data: data,
+      });
 
-      };
+    };
   };
 });

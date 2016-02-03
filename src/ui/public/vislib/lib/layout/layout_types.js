@@ -15,8 +15,8 @@ define(function (require) {
       area: Private(require('ui/vislib/lib/layout/types/column_layout')),
       pie: Private(require('ui/vislib/lib/layout/types/pie_layout')),
       tile_map: Private(require('ui/vislib/lib/layout/types/map_layout')),
-	  chord: Private(require('ui/vislib/lib/layout/types/relation_layout')),
-	  relation: Private(require('ui/vislib/lib/layout/types/relation_layout'))
+      chord: Private(require('ui/vislib/lib/layout/types/relation_layout')),
+      relation: Private(require('ui/vislib/lib/layout/types/relation_layout'))
     };
   };
 });

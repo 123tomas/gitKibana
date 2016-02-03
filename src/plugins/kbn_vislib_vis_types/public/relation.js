@@ -8,7 +8,7 @@ define(function (require) {
       title: 'Relation chart',
       icon: 'fa-compress',
       description: 'Relation chart allows you to draw easy relations between nodes.',
-     params: {
+      params: {
         defaults: {
           shareYAxis: true,
           addTooltip: true,
@@ -34,7 +34,7 @@ define(function (require) {
           name: 'metric',
           title: 'Line between dots',
           min: 1,
-		  max: 1,
+          max: 1,
           aggFilter: ['count','sum','min','max'],
           defaults: [
             { schema: 'metric', type: 'count' }

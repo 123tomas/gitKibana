@@ -348,13 +348,12 @@ define(function (require) {
     Data.prototype.shouldBeStacked = function () {
       var isHistogram = (this._attr.type === 'histogram');
       var isArea = (this._attr.type === 'area');
-	  var isDot = (this._attr.type === 'dot');
+      var isDot = (this._attr.type === 'dot');
       var isOverlapping = (this._attr.mode === 'overlap');
       var grouped = (this._attr.mode === 'grouped');
-
       var stackedHisto = isHistogram && !grouped;
       var stackedArea = isArea && !isOverlapping;
-	  var stackedDot = isDot && !isOverlapping;
+      var stackedDot = isDot && !isOverlapping;
 
       return stackedHisto || stackedArea || stackedDot;
     };

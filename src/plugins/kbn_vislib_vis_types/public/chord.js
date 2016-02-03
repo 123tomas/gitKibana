@@ -8,7 +8,7 @@ define(function (require) {
       title: 'Chord chart',
       icon: 'fa-spinner',
       description: 'Chord chart displays relationship between group of data in circle view.',
-     params: {
+      params: {
         defaults: {
           shareYAxis: true,
           addTooltip: true,
@@ -34,7 +34,7 @@ define(function (require) {
           name: 'metric',
           title: 'Relation between data',
           min: 1,
-		  max: 1,
+          max: 1,
           aggFilter: ['count','sum','min','max'],
           defaults: [
             { schema: 'metric', type: 'count' }
