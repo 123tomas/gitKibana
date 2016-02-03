@@ -80,7 +80,7 @@ define(function (require) {
       color = d3.scale.category20();
 
       tooltip = div.append('div')
-  .attr('class', 'tooltip-relation')
+      .attr('class', 'tooltip-relation')
       .style('opacity', 0);
 
       scale = d3.scale.linear()

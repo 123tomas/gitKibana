@@ -47,15 +47,67 @@ define(function (require) {
       var self = this;
       var scale;
       var parsedData = self.parseData(data);
-      var sourceValues = parsedData[0];
-      var destinationValues = parsedData[1];
-      var matrix = parsedData[2];
+      var labels = parsedData[0];
+      var matrix = parsedData[1];
       var color;
       var tooltip;
+      var fill = d3.scale.category10();
       var container = svg.append('g');
+      var r1 = height / 2;
+      var innerRadius = Math.min(width, height) * .41;
+      var outerRadius = innerRadius * 1.1;
+
+      var chord = d3.layout.chord()
+        .padding(.05)
+        .sortSubgroups(d3.descending)
+        .matrix(matrix);
+      
+	  container.attr('transform', 'translate(' + (width) / 2 + ',' + (height) / 2 + ')');
+      container.append('g').selectAll('path')
+        .data(chord.groups)
+        .enter().append('path')
+        .attr('class', 'arc')
+        .style('fill', function (d) {
+          return labels[d.index].includes('destination') ? '#444444' : fill(d.index);
+        })
+        .attr('d', d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
+        .on('mouseover', fade(.1))
+        .on('mouseout', fade(.7));
+
+      container.append('g')
+        .attr('class', 'chord')
+        .selectAll('path')
+        .data(chord.chords)
+        .enter().append('path')
+        .attr('d', d3.svg.chord().radius(innerRadius))
+        .style('fill', function(d) { return fill(d.target.index); })
+        .style('opacity', 0.7);
+
+      container.append('g').selectAll('.arc')
+        .data(chord.groups)
+        .enter().append('svg:text')
+        .attr('dy', '.35em')
+        .attr('text-anchor', function(d) { return ((d.startAngle + d.endAngle) / 2) > Math.PI ? 'end' : null; })
+        .attr('transform', function(d) {
+          return 'rotate(' + (((d.startAngle + d.endAngle) / 2) * 180 / Math.PI - 90) + ")"
+          + 'translate(' + (r1 - 15) + ')'
+          + (((d.startAngle + d.endAngle) / 2) > Math.PI ? 'rotate(180)' : '');
+        })
+        .text(function(d) {
+          return labels[d.index];
+        });
+
+      function fade(opacity) {
+        return function(g, i) {
+          svg.selectAll('.chord path')
+            .filter(function(d) { return d.source.index != i && d.target.index != i; })
+            .transition()
+            .style('opacity', opacity);
+        };
+      }
     };
 
- 	/**
+    /**
      * Remove not unique values from array
      *
      * @method toUnique
@@ -134,7 +186,7 @@ define(function (require) {
       console.log(attributes);
       console.log(links);
 
-      return [sourceValues,destinationValues,matrix];
+      return [attributes,matrix];
     };
 
     /**
@@ -230,9 +282,7 @@ define(function (require) {
 
           svg = div.append('svg')
           .attr('width', width + margin.left + margin.right)
-          .attr('height', height + margin.top + margin.bottom)
-          .append('g')
-          .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+          .attr('height', height + margin.top + margin.bottom);
 
           self.addClipPath(svg, width, height);
           self.addChordGraph(svg, div, layers,width, height);
