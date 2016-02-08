@@ -61,8 +61,12 @@ define(function (require) {
         .padding(.05)
         .sortSubgroups(d3.descending)
         .matrix(matrix);
-      
-	  container.attr('transform', 'translate(' + (width) / 2 + ',' + (height) / 2 + ')');
+
+      tooltip = div.append('div')
+        .attr('class', 'tooltip-relation')
+        .style('opacity', 0);
+
+      container.attr('transform', 'translate(' + (width) / 2 + ',' + (height) / 2 + ')');
       container.append('g').selectAll('path')
         .data(chord.groups)
         .enter().append('path')
@@ -71,8 +75,8 @@ define(function (require) {
           return labels[d.index].includes('destination') ? '#444444' : fill(d.index);
         })
         .attr('d', d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
-        .on('mouseover', fade(.1))
-        .on('mouseout', fade(.7));
+        .on('mouseover', self.fade(.05, true, svg, labels, tooltip))
+        .on('mouseout', self.fade(.8, false, svg, labels, tooltip));
 
       container.append('g')
         .attr('class', 'chord')
@@ -80,31 +84,31 @@ define(function (require) {
         .data(chord.chords)
         .enter().append('path')
         .attr('d', d3.svg.chord().radius(innerRadius))
-        .style('fill', function(d) { return fill(d.target.index); })
-        .style('opacity', 0.7);
-
-      container.append('g').selectAll('.arc')
-        .data(chord.groups)
-        .enter().append('svg:text')
-        .attr('dy', '.35em')
-        .attr('text-anchor', function(d) { return ((d.startAngle + d.endAngle) / 2) > Math.PI ? 'end' : null; })
-        .attr('transform', function(d) {
-          return 'rotate(' + (((d.startAngle + d.endAngle) / 2) * 180 / Math.PI - 90) + ")"
-          + 'translate(' + (r1 - 15) + ')'
-          + (((d.startAngle + d.endAngle) / 2) > Math.PI ? 'rotate(180)' : '');
-        })
-        .text(function(d) {
-          return labels[d.index];
-        });
-
-      function fade(opacity) {
-        return function(g, i) {
+        .style('fill', function (d) { return fill(d.target.index); })
+        .style('opacity',0.8)
+        .on('mouseover', function (d){
+          console.log(d);
           svg.selectAll('.chord path')
-            .filter(function(d) { return d.source.index != i && d.target.index != i; })
+            .filter(function (b) { return b.source.index !== d.source.index || b.target.index !== d.target.index; })
             .transition()
-            .style('opacity', opacity);
-        };
-      }
+            .style('opacity', 0.1);
+          tooltip.transition()
+            .duration(200)
+            .style('opacity', .9);
+          tooltip.html('<div class="source"><strong>Source:&nbsp</strong>' + labels[d.source.index].replace('source','') + '</div>'
+          + '<div class="target"><strong>Destination:&nbsp</strong>' + labels[d.target.index].replace('destination','') + '</div>'
+          + '<div class="count"><strong>' + d.source.value + '</strong></div>');
+          tooltip.style('left', (d3.event.pageX) + 'px')
+            .style('top', (d3.event.pageY) + 'px');
+        })
+        .on('mouseout', function (d){
+          svg.selectAll('.chord path')
+            .transition()
+            .style('opacity', 0.8);
+          tooltip.transition()
+            .duration(200)
+            .style('opacity', 0);
+        })
     };
 
     /**
@@ -117,7 +121,39 @@ define(function (require) {
       b = a.length;
       while (c = --b) while (c--) a[b] !== a[c] || a.splice(c,1);
     };
-
+    
+    ChordChart.prototype.fade = function (opacity, visible, svg, labels, tooltip) {
+      return function (g, i) {
+        svg.selectAll('.chord path')
+          .filter(function (b) { return b.source.index !== i && b.target.index !== i; })
+          .transition()
+          .style('opacity', opacity);
+        var text = labels[i];
+        var isSource = false;
+        if (text.includes('source')) {
+          isSource = true;
+        };
+        if(isSource){
+          text = text.replace('source','');
+          text = '<strong>Source:&nbsp</strong>' + text;
+        }else{
+          text = text.replace('destination','');
+          text = '<strong>Destination:&nbsp</strong>' + text;
+        }
+        if(visible){
+          tooltip.transition()
+            .duration(200)
+            .style('opacity', .9);
+          tooltip.html('<div class="ip">' + text + '</div>');
+          tooltip.style('left', (d3.event.pageX) + 'px')
+            .style('top', (d3.event.pageY) + 'px');
+        }else{
+          tooltip.transition()
+            .duration(200)
+            .style('opacity', 0);
+        }
+      };
+    };
     /**
      * Parse data into form suitable form force layered graph
      *
@@ -181,10 +217,6 @@ define(function (require) {
         matrix[index1][index2] = matrix[index1][index2] + link[2];
         matrix[index2][index1] = matrix[index2][index1] + link[2];
       });
-
-      console.log(matrix);
-      console.log(attributes);
-      console.log(links);
 
       return [attributes,matrix];
     };
