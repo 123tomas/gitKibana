@@ -43,7 +43,7 @@ define(function (require) {
         {
           group: 'buckets',
           name: 'segment',
-          title: 'First data set',
+          title: 'Source',
           min: 1,
           max: 1,
           aggFilter: ['terms']
@@ -51,7 +51,7 @@ define(function (require) {
         {
           group: 'buckets',
           name: 'group',
-          title: 'Second data set',
+          title: 'Destination',
           min: 1,
           max: 1,
           aggFilter: ['terms']

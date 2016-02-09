@@ -84,9 +84,9 @@ define(function (require) {
         .data(chord.chords)
         .enter().append('path')
         .attr('d', d3.svg.chord().radius(innerRadius))
-        .style('fill', function (d) { return fill(d.target.index); })
+        .style('fill', function (d) { return fill(d.source.index); })
         .style('opacity',0.8)
-        .on('mouseover', function (d){
+        .on('mouseover', function (d) {
           console.log(d);
           svg.selectAll('.chord path')
             .filter(function (b) { return b.source.index !== d.source.index || b.target.index !== d.target.index; })
@@ -101,14 +101,14 @@ define(function (require) {
           tooltip.style('left', (d3.event.pageX) + 'px')
             .style('top', (d3.event.pageY) + 'px');
         })
-        .on('mouseout', function (d){
+        .on('mouseout', function (d) {
           svg.selectAll('.chord path')
             .transition()
             .style('opacity', 0.8);
           tooltip.transition()
             .duration(200)
             .style('opacity', 0);
-        })
+        });
     };
 
     /**
@@ -121,7 +121,13 @@ define(function (require) {
       b = a.length;
       while (c = --b) while (c--) a[b] !== a[c] || a.splice(c,1);
     };
-    
+
+    /**
+     * Fade HTML element on mouse over/out
+     *
+     * @method fade
+     * @param opacity, visible, svg, labels, tooltip
+     */
     ChordChart.prototype.fade = function (opacity, visible, svg, labels, tooltip) {
       return function (g, i) {
         svg.selectAll('.chord path')
@@ -133,21 +139,21 @@ define(function (require) {
         if (text.includes('source')) {
           isSource = true;
         };
-        if(isSource){
+        if (isSource) {
           text = text.replace('source','');
           text = '<strong>Source:&nbsp</strong>' + text;
-        }else{
+        }else {
           text = text.replace('destination','');
           text = '<strong>Destination:&nbsp</strong>' + text;
         }
-        if(visible){
+        if (visible) {
           tooltip.transition()
             .duration(200)
             .style('opacity', .9);
           tooltip.html('<div class="ip">' + text + '</div>');
           tooltip.style('left', (d3.event.pageX) + 'px')
             .style('top', (d3.event.pageY) + 'px');
-        }else{
+        }else {
           tooltip.transition()
             .duration(200)
             .style('opacity', 0);
