@@ -44,7 +44,7 @@ define(function (require) {
      * @param data {Array} Array of object data points
      * @returns {D3.UpdateSelection} SVG with circles added
      */
-    RelationChart.prototype.addForcedGraph = function (svg, div, data, width, height) {
+    RelationChart.prototype.addForcedGraph = function (svg, div, data, names, width, height) {
       var self = this;
       var scale;
       var parsedData = self.parseData(data);
@@ -96,9 +96,9 @@ define(function (require) {
           tooltip.transition()
             .duration(200)
             .style('opacity', .9);
-          tooltip.html('<div class="source"><strong>Source:&nbsp</strong>' + d.source.name + '</div>'
-          + '<div class="target"><strong>Destination:&nbsp</strong>' + d.target.name + '</div>'
-          + '<div class="count"><strong>' + d.count + '</strong></div>');
+          tooltip.html('<div class="source"><strong>Source&nbsp(' + names[1] +'):&nbsp</strong>' + d.source.name + '</div>'
+          + '<div class="target"><strong>Destination&nbsp(' + names[2] +'):&nbsp</strong>' + d.target.name + '</div>'
+          + '<div class="count"><strong>' + names[0] + ':&nbsp</strong>' + d.count + '</div>');
           tooltip.style('left', (d3.event.pageX) + 'px')
             .style('top', (d3.event.pageY) + 'px');
         })
@@ -285,12 +285,16 @@ define(function (require) {
       var svg;
       var width;
       var height;
+      var names = [];
 
       return function (selection) {
         selection.each(function (data) {
           var el = this;
 
           var layers = data.series.map(function mapSeries(d) {
+            names[0] = d.values[0].aggConfig.vis.aggs[0]._opts.type;
+            names[1] = d.values[0].aggConfig.vis.aggs[1]._opts.params.field;
+            names[2] = d.values[0].aggConfig.vis.aggs[2]._opts.params.field;
             var label = d.label;
             return d.values.map(function mapValues(e, i) {
               return {
@@ -318,7 +322,7 @@ define(function (require) {
           .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
           self.addClipPath(svg, width, height);
-          self.addForcedGraph(svg, div, layers, width, height);
+          self.addForcedGraph(svg, div, layers, names, width, height);
 
           return svg;
         });

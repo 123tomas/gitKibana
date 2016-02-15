@@ -43,7 +43,7 @@ define(function (require) {
      * @param data {Array} Array of object data points
      * @returns {D3.UpdateSelection} SVG with circles added
      */
-    ChordChart.prototype.addChordGraph = function (svg, div, data, width, height) {
+    ChordChart.prototype.addChordGraph = function (svg, div, data, names, width, height) {
       var self = this;
       var scale;
       var parsedData = self.parseData(data);
@@ -75,8 +75,8 @@ define(function (require) {
           return labels[d.index].includes('destination') ? '#444444' : fill(d.index);
         })
         .attr('d', d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
-        .on('mouseover', self.fade(.05, true, svg, labels, tooltip))
-        .on('mouseout', self.fade(.8, false, svg, labels, tooltip));
+        .on('mouseover', self.fade(.05, true, svg, labels, tooltip, names))
+        .on('mouseout', self.fade(.8, false, svg, labels, tooltip, names));
 
       container.append('g')
         .attr('class', 'chord')
@@ -95,9 +95,9 @@ define(function (require) {
           tooltip.transition()
             .duration(200)
             .style('opacity', .9);
-          tooltip.html('<div class="source"><strong>Source:&nbsp</strong>' + labels[d.source.index].replace('source','') + '</div>'
-          + '<div class="target"><strong>Destination:&nbsp</strong>' + labels[d.target.index].replace('destination','') + '</div>'
-          + '<div class="count"><strong>' + d.source.value + '</strong></div>');
+          tooltip.html('<div class="source"><strong>Source&nbsp(' + names[1] + '):&nbsp</strong>' + labels[d.source.index].replace('source','') + '</div>'
+          + '<div class="target"><strong>Destination&nbsp(' + names[2] + '):&nbsp</strong>' + labels[d.target.index].replace('destination','') + '</div>'
+          + '<div class="count"><strong>' + names[0] + ':&nbsp</strong>' + d.source.value + '</div>');
           tooltip.style('left', (d3.event.pageX) + 'px')
             .style('top', (d3.event.pageY) + 'px');
         })
@@ -128,7 +128,7 @@ define(function (require) {
      * @method fade
      * @param opacity, visible, svg, labels, tooltip
      */
-    ChordChart.prototype.fade = function (opacity, visible, svg, labels, tooltip) {
+    ChordChart.prototype.fade = function (opacity, visible, svg, labels, tooltip, names) {
       return function (g, i) {
         svg.selectAll('.chord path')
           .filter(function (b) { return b.source.index !== i && b.target.index !== i; })
@@ -141,10 +141,10 @@ define(function (require) {
         };
         if (isSource) {
           text = text.replace('source','');
-          text = '<strong>Source:&nbsp</strong>' + text;
+          text = '<strong>Source&nbsp(' + names[1] +'):&nbsp</strong>' + text;
         }else {
           text = text.replace('destination','');
-          text = '<strong>Destination:&nbsp</strong>' + text;
+          text = '<strong>Destination&nbsp(' + names[2] +'):&nbsp</strong>' + text;
         }
         if (visible) {
           tooltip.transition()
@@ -291,13 +291,18 @@ define(function (require) {
       var div;
       var svg;
       var width;
+      var names;
       var height;
+      var names = [];
 
       return function (selection) {
         selection.each(function (data) {
           var el = this;
 
           var layers = data.series.map(function mapSeries(d) {
+            names[0] = d.values[0].aggConfig.vis.aggs[0]._opts.type;
+            names[1] = d.values[0].aggConfig.vis.aggs[1]._opts.params.field;
+            names[2] = d.values[0].aggConfig.vis.aggs[2]._opts.params.field;
             var label = d.label;
             return d.values.map(function mapValues(e, i) {
               return {
@@ -308,7 +313,6 @@ define(function (require) {
               };
             });
           });
-
           width = elWidth - margin.left - margin.right;
           height = elHeight - margin.top - margin.bottom;
 
@@ -323,7 +327,7 @@ define(function (require) {
           .attr('height', height + margin.top + margin.bottom);
 
           self.addClipPath(svg, width, height);
-          self.addChordGraph(svg, div, layers,width, height);
+          self.addChordGraph(svg, div, layers, names, width, height);
 
           return svg;
         });
