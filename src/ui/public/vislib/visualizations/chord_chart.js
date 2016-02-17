@@ -35,13 +35,16 @@ define(function (require) {
       });
     }
 
-	/**
+     /**
      * Adds chord graph to SVG
      *
      * @method addChordGraph
      * @param svg {HTMLElement} SVG to which rect are appended
+     * @param div {HTMLElement} DIV to which tooltip is appended
      * @param data {Array} Array of object data points
-     * @returns {D3.UpdateSelection} SVG with circles added
+     * @param names {Array} Array of length 3 with names of data
+     * @param width, height {number} width and height of new svg element
+     * @returns {D3.UpdateSelection} SVG with force layered graph added
      */
     ChordChart.prototype.addChordGraph = function (svg, div, data, names, width, height) {
       var self = this;
@@ -95,8 +98,10 @@ define(function (require) {
           tooltip.transition()
             .duration(200)
             .style('opacity', .9);
-          tooltip.html('<div class="source"><strong>Source&nbsp(' + names[1] + '):&nbsp</strong>' + labels[d.source.index].replace('source','') + '</div>'
-          + '<div class="target"><strong>Destination&nbsp(' + names[2] + '):&nbsp</strong>' + labels[d.target.index].replace('destination','') + '</div>'
+          tooltip.html('<div class="source"><strong>Source&nbsp(' + names[1] + '):&nbsp</strong>'
+          + labels[d.source.index].replace('source','') + '</div>'
+          + '<div class="target"><strong>Destination&nbsp(' + names[2] + '):&nbsp</strong>'
+          + labels[d.target.index].replace('destination','') + '</div>'
           + '<div class="count"><strong>' + names[0] + ':&nbsp</strong>' + d.source.value + '</div>');
           tooltip.style('left', (d3.event.pageX) + 'px')
             .style('top', (d3.event.pageY) + 'px');
@@ -113,7 +118,6 @@ define(function (require) {
 
     /**
      * Remove not unique values from array
-     *
      * @method toUnique
      * @param a,b,c {Array} Array of object data points
      */
@@ -124,9 +128,13 @@ define(function (require) {
 
     /**
      * Fade HTML element on mouse over/out
-     *
      * @method fade
-     * @param opacity, visible, svg, labels, tooltip
+     * @param opacity{Number} opacity which will be set to tooltip
+     * @param visible{Boolean} says whether tooltip is visible or not
+     * @param svg {HTMLElement} SVG to which rect are appended
+     * @param tooltip {HTMLElement} Tooltip to which data are written
+     * @param labels {Array} Array of names of data
+     * @param names {Array} Array of names of group of data
      */
     ChordChart.prototype.fade = function (opacity, visible, svg, labels, tooltip, names) {
       return function (g, i) {
@@ -141,10 +149,10 @@ define(function (require) {
         };
         if (isSource) {
           text = text.replace('source','');
-          text = '<strong>Source&nbsp(' + names[1] +'):&nbsp</strong>' + text;
+          text = '<strong>Source&nbsp(' + names[1] + '):&nbsp</strong>' + text;
         }else {
           text = text.replace('destination','');
-          text = '<strong>Destination&nbsp(' + names[2] +'):&nbsp</strong>' + text;
+          text = '<strong>Destination&nbsp(' + names[2] + '):&nbsp</strong>' + text;
         }
         if (visible) {
           tooltip.transition()
@@ -259,11 +267,11 @@ define(function (require) {
      * Check, if there is enough data to display
      *
      * @method draw
-     * @returns {Function} Creates the relation chart
+     * @returns {Function} Creates the chord chart
      */
     ChordChart.prototype.checkIfEnoughData = function () {
       var series = this.chartData.series;
-      var message = 'Relation charts require Source and Destination to be set and this properties must be different ';
+      var message = 'Chord charts require Source and Destination to be set and this properties must be different ';
 
       var notEnoughData = series.some(function (obj) {
         return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].x !== obj.values[0].series);
@@ -278,7 +286,7 @@ define(function (require) {
      * Renders d3 visualization
      *
      * @method draw
-     * @returns {Function} Creates the relation chart
+     * @returns {Function} Creates the chord chart
      */
     ChordChart.prototype.draw = function () {
       var self = this;

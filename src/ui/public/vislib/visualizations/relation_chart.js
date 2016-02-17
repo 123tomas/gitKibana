@@ -41,8 +41,11 @@ define(function (require) {
      *
      * @method addForcedGraph
      * @param svg {HTMLElement} SVG to which rect are appended
+     * @param div {HTMLElement} DIV to which tooltip is appended
      * @param data {Array} Array of object data points
-     * @returns {D3.UpdateSelection} SVG with circles added
+     * @param names {Array} Array of length 3 with names of data
+     * @param width, height {number} width and height of new svg element
+     * @returns {D3.UpdateSelection} SVG with force layered graph added
      */
     RelationChart.prototype.addForcedGraph = function (svg, div, data, names, width, height) {
       var self = this;
@@ -59,6 +62,7 @@ define(function (require) {
         .scaleExtent([1, 10])
         .on('zoom', zoomed);
 
+      //enable graph to be zoomed
       function zoomed() {
         container.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
       }
@@ -96,8 +100,8 @@ define(function (require) {
           tooltip.transition()
             .duration(200)
             .style('opacity', .9);
-          tooltip.html('<div class="source"><strong>Source&nbsp(' + names[1] +'):&nbsp</strong>' + d.source.name + '</div>'
-          + '<div class="target"><strong>Destination&nbsp(' + names[2] +'):&nbsp</strong>' + d.target.name + '</div>'
+          tooltip.html('<div class="source"><strong>Source&nbsp(' + names[1] + '):&nbsp</strong>' + d.source.name + '</div>'
+          + '<div class="target"><strong>Destination&nbsp(' + names[2] + '):&nbsp</strong>' + d.target.name + '</div>'
           + '<div class="count"><strong>' + names[0] + ':&nbsp</strong>' + d.count + '</div>');
           tooltip.style('left', (d3.event.pageX) + 'px')
             .style('top', (d3.event.pageY) + 'px');
@@ -146,8 +150,8 @@ define(function (require) {
           var dy = d.target.y - d.source.y;
           var dr = Math.sqrt(dx * dx + dy * dy);
           return 'M' + d.source.x + ',' + d.source.y + 'A' +
-		  dr + ',' + dr + ' 0 0 1,' + d.target.x + ',' + d.target.y +
-		  'A' + dr + ',' + dr + ' 0 0 0,' + d.source.x + ',' + d.source.y;
+          dr + ',' + dr + ' 0 0 1,' + d.target.x + ',' + d.target.y +
+          'A' + dr + ',' + dr + ' 0 0 0,' + d.source.x + ',' + d.source.y;
         });
 
         node.attr('transform', function (d) {
@@ -178,7 +182,7 @@ define(function (require) {
      * Parse data into form suitable form force layered graph
      *
      * @method parseData
-     * @param data
+     * @param data {Array} data which will be parsed to suitable form
      * @return array of parsed data
      */
     RelationChart.prototype.parseData = function (data) {
