@@ -263,7 +263,8 @@ define(function (require) {
       var message = 'Relation charts require Source and Destination to be set and this properties must be different ';
 
       var notEnoughData = series.some(function (obj) {
-        return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].x !== obj.values[0].series);
+        return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].x !== obj.values[0].series
+        && obj.values[0].y !== null);
       });
 
       if (notEnoughData) {

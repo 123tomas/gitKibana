@@ -90,7 +90,6 @@ define(function (require) {
         .style('fill', function (d) { return fill(d.source.index); })
         .style('opacity',0.8)
         .on('mouseover', function (d) {
-          console.log(d);
           svg.selectAll('.chord path')
             .filter(function (b) { return b.source.index !== d.source.index || b.target.index !== d.target.index; })
             .transition()
@@ -274,7 +273,8 @@ define(function (require) {
       var message = 'Chord charts require Source and Destination to be set and this properties must be different ';
 
       var notEnoughData = series.some(function (obj) {
-        return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].x !== obj.values[0].series);
+        return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].x !== obj.values[0].series
+        && obj.values[0].y !== null);
       });
 
       if (notEnoughData) {
