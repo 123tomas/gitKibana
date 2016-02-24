@@ -56,7 +56,9 @@ define(function (require) {
       var links = parsedData[2];
       var counts = [];
       var color;
+      var colorAttribute;
       var tooltip;
+
       var container = svg.append('g');
       var zoom = d3.behavior.zoom()
         .scaleExtent([1, 10])
@@ -94,7 +96,8 @@ define(function (require) {
       var link = container.selectAll('.link')
         .data(links)
         .enter().append('svg:path')
-        .attr('stroke', function (d) {return scale(d.count);})
+        .attr('stroke', function (d) {
+          return scale(d.count);})
         .attr('stroke-width',1)
         .on('mouseover', function (d) {
           tooltip.transition()
@@ -127,8 +130,13 @@ define(function (require) {
         .data(nodesObjects)
         .enter().append('circle')
         .attr('class', 'node')
+        .attr('id', function (d) {return d.name;})
         .attr('r', function (d) {return scale(d.count);})
-        .attr('fill',function (d,i) {return color(i);})
+        .attr('fill',function (d,i) {
+          colorAttribute = color(i);
+          d.color = colorAttribute;
+          return colorAttribute;
+        })
         .call(force.drag)
         .on('mouseover', function (d) {
           tooltip.transition()
@@ -142,7 +150,45 @@ define(function (require) {
           tooltip.transition()
             .duration(200)
             .style('opacity', 0);
-        });
+        })
+        .on('click', connectedNodes); //Added cod
+
+      //setup to ligt up the neighbour nodes on dblclick
+      var toggle = 0;
+      //Create an array logging what is connected to what
+      var linkedByIndex = {};
+
+      for (i = 0; i < nodesObjects.length; i++) {
+        linkedByIndex[i + "," + i] = 1;
+      };
+      links.forEach(function (d) {
+        linkedByIndex[d.source.index + "," + d.target.index] = 1;
+      });
+
+      //Control up whether a pair are neighbours
+      function neighboring(a, b) {
+        return linkedByIndex[a.index + "," + b.index];
+      };
+
+      function connectedNodes() {
+        if (toggle == 0) {
+          //Reduce the opacity of all but the neighbouring nodes
+          d = d3.select(this).node().__data__;
+          node.style("opacity", function (o) {
+            return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
+          });
+          link.style("opacity", function (o) {
+            return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
+          });
+          //Reduce the op
+          toggle = 1;
+        } else {
+          //Put them back to opacity=1
+          node.style("opacity", 1);
+          link.style("opacity", 1);
+          toggle = 0;
+        }
+      }
 
       force.on('tick', function () {
         link.attr('d', function (d) {
@@ -165,6 +211,9 @@ define(function (require) {
         force.tick();
         k = k + 1;
       }
+
+      this.addLegend(div, width, height, nodesObjects);
+      
     };
 
     /**
@@ -176,6 +225,79 @@ define(function (require) {
     RelationChart.prototype.toUnique = function (a, b, c) {
       b = a.length;
       while (c = --b) while (c--) a[b] !== a[c] || a.splice(c,1);
+    };
+
+    /**
+     * Add legend to a chart
+     *
+     * @method addLegend
+     * @param div {HTMLElement} Element to which legend is added
+     * @param width,height {number} Width and height to calculate legend width and height
+     * @param nodesObjects {Array} Array of nodes which will be added to legend	 
+     */
+    RelationChart.prototype.addLegend = function (div, width, height, nodesObjects) {
+      var legend1 = div.append('div').attr('class','legendClass');
+      legend1.style('height',height + 'px');
+      legend1.style('width','110x');
+      legend1.style('left', width-130 + 'px')
+      legend1.html('<span id="legendButton">Legend</span>');
+
+      var legendDiv = legend1.append('div')
+      .attr('class', 'legendDiv')
+      .attr('min-height', height + 'px');
+
+      var legendSvg = legendDiv.append('svg')
+      .attr('class','legendSvg')
+      .attr('height', nodesObjects.length*27)
+      .attr('width',130);
+
+      var legend = legendSvg.append('g')
+      .attr('id', 'legend')
+      .attr('x', 0)
+      .attr('y', -20)
+      .attr('height', 100)
+      .attr('width', 100);
+
+      legend.selectAll('g').data(nodesObjects)
+      .enter()
+      .append('g')
+      .each(function(d, i) {
+        var g = d3.select(this);
+        g.append('circle')
+          .attr('cx', 5)
+          .attr('cy', i*25+20)
+          .attr('r', 5)
+          .on('mouseover', function() {
+            var node = document.getElementById(d.name);
+            node.style.fill = 'black';
+          })
+          .on('mouseout', function() {
+            var node = document.getElementById(d.name);
+            node.style.fill = d.color;
+          })
+          .style('fill', d.color);
+
+        g.append('text')
+          .attr('x', 15)
+          .attr('y', i * 25 + 25)
+          .attr('height',30)
+          .attr('width',100)
+          .style('cursor','default')
+          .on('mouseover', function() {
+            var node = document.getElementById(d.name);
+            node.style.fill = 'black';
+          })
+          .on('mouseout', function() {
+            var node = document.getElementById(d.name);
+            node.style.fill = d.color;
+          })
+          .text(d.name)
+      });
+
+      $('#legendButton').click(function() {
+        $('.legendSvg').toggle();
+      });
+
     };
 
     /**
@@ -203,7 +325,7 @@ define(function (require) {
 
       //adding to nodesObject array Nodes object which has attributes name and count
       nodes.forEach(function (node) {
-        nodesObjects.push({name:node,count:0});
+        nodesObjects.push({name:node,count:0,color:null});
       });
 
       //every node need to have number of communication going to or from its
@@ -284,7 +406,7 @@ define(function (require) {
       var margin = this._attr.margin;
       var elWidth = this._attr.width = $elem.width();
       var elHeight = this._attr.height = $elem.height();
-      var minWidth = 20;
+      var minWidth = 350;
       var minHeight = 20;
       var div;
       var svg;
@@ -300,6 +422,7 @@ define(function (require) {
             names[0] = d.values[0].aggConfig.vis.aggs[0]._opts.type;
             names[1] = d.values[0].aggConfig.vis.aggs[1]._opts.params.field;
             names[2] = d.values[0].aggConfig.vis.aggs[2]._opts.params.field;
+            names[3] = d.values[0].aggConfig.vis.aggs[1].__schema.title;
             var label = d.label;
             return d.values.map(function mapValues(e, i) {
               return {
@@ -313,6 +436,10 @@ define(function (require) {
 
           width = elWidth - margin.left - margin.right;
           height = elHeight - margin.top - margin.bottom;
+
+          if(names[3] === 'Destination') {
+            throw new errors.NotEnoughData('Be careful to add Source before Destination! It can confuse you.');
+          }
 
           if (width < minWidth || height < minHeight) {
             throw new errors.ContainerTooSmall();
