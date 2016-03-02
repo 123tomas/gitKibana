@@ -58,19 +58,19 @@ define(function (require) {
       var container = svg.append('g');
       var r1;
       var innerRadius;
-	  
-	  //variable which holds boolean value to determinte whether show or not to show checkbox
-	  var isChecked = $('#legendCheckbox').is(':checked');
-      
-	  if(isChecked){
-	    var r1 = Math.min(width - 160, height - 160) / 2;
-        var innerRadius = Math.min(width - 160, height - 160) * .41;
-	  } else {
-	    var r1 = height / 2;
-        var innerRadius = Math.min(width, height) * .41;
-	  }
-	  
-	  var outerRadius = innerRadius * 1.1;
+
+      //variable which holds boolean value to determinte whether show or not to show checkbox
+      var isChecked = $('#legendCheckbox').is(':checked');
+
+      if (isChecked) {
+        r1 = Math.min(width - 160, height - 160) / 2;
+        innerRadius = Math.min(width - 160, height - 160) * .41;
+      } else {
+        r1 = height / 2;
+        innerRadius = Math.min(width, height) * .41;
+      }
+
+      var outerRadius = innerRadius * 1.1;
       var chord = d3.layout.chord()
         .padding(.05)
         .sortSubgroups(d3.descending)
@@ -126,27 +126,27 @@ define(function (require) {
             .style('opacity', 0);
         });
 
-	  if(isChecked){
-      container.append('g')
-        .attr('class','chord-text')
-        .selectAll('.arc')
-        .data(chord.groups)
-        .enter().append('svg:text')
-        .attr('dy', '.35em')
-        .attr('text-anchor', function (d) { return ((d.startAngle + d.endAngle) / 2) > Math.PI ? 'end' : null; })
-        .attr('transform', function (d) {
-          return 'rotate(' + (((d.startAngle + d.endAngle) / 2) * 180 / Math.PI - 90) + ')'
+      if (isChecked) {
+        container.append('g')
+          .attr('class','chord-text')
+          .selectAll('.arc')
+          .data(chord.groups)
+          .enter().append('svg:text')
+          .attr('dy', '.35em')
+          .attr('text-anchor', function (d) { return ((d.startAngle + d.endAngle) / 2) > Math.PI ? 'end' : null; })
+          .attr('transform', function (d) {
+            return 'rotate(' + (((d.startAngle + d.endAngle) / 2) * 180 / Math.PI - 90) + ')'
               + 'translate(' + (r1 - 15) + ')'
               + (((d.startAngle + d.endAngle) / 2) > Math.PI ? 'rotate(180)' : '');
-        })
-        .text(function (d) {
-          if (labels[d.index].includes('source')) {
-            return labels[d.index].replace('source','');
-          } else {
-            return labels[d.index].replace('destination','');
-          }}
-        );
-	  };
+          })
+          .text(function (d) {
+            if (labels[d.index].includes('source')) {
+              return labels[d.index].replace('source','');
+            } else {
+              return labels[d.index].replace('destination','');
+            }}
+          );
+      };
     };
 
     /**
@@ -224,9 +224,12 @@ define(function (require) {
       //parsing data to links and values
       data.forEach(function (arrayOfLinks) {
         arrayOfLinks.forEach(function (link) {
-          links.push([link.x,link.label,link.y]);
-          sourceValues.push(link.x);
-          destinationValues.push(link.label);
+          if (link.y !== 0) {
+            console.log(link.y);
+            links.push([link.x,link.label,link.y]);
+            sourceValues.push(link.x);
+            destinationValues.push(link.label);
+          }
         });
       });
 

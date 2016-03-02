@@ -324,10 +324,12 @@ define(function (require) {
       //Data parsing into form which are suitable to d3.force function
       data.forEach(function (row) {
         row.forEach(function (datas) {
-          nodes.push(datas.x);
-          nodes.push(datas.label);
-          self.toUnique(nodes);
-          links.push({source:datas.x,target:datas.label,count:datas.y});
+          if (datas.y !== 0) {
+            nodes.push(datas.x);
+            nodes.push(datas.label);
+            self.toUnique(nodes);
+            links.push({source:datas.x,target:datas.label,count:datas.y});
+          }
         });
       });
 
@@ -456,7 +458,7 @@ define(function (require) {
           div = d3.select(el);
 
           svg = div.append('svg')
-          .attr('width', width + margin.left + margin.right-15)
+          .attr('width', width + margin.left + margin.right - 15)
           .attr('height', height + margin.top + margin.bottom)
           .append('g')
           .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
