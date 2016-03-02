@@ -8,26 +8,6 @@ define(function (require) {
       title: 'Relation chart',
       icon: 'fa-compress',
       description: 'Relation chart allows you to draw easy relations between nodes.',
-      params: {
-        defaults: {
-          shareYAxis: true,
-          addTooltip: true,
-          addLegend: true,
-          showCircles: true,
-          smoothLines: false,
-          interpolate: 'linear',
-          scale: 'linear',
-          drawLinesBetweenPoints: true,
-          radiusRatio: 9,
-          times: [],
-          addTimeMarker: false,
-          defaultYExtents: false,
-          setYExtents: false,
-          yAxis: {}
-        },
-        scales: ['linear', 'log', 'square root'],
-        editor: require('plugins/kbn_vislib_vis_types/editors/line.html')
-      },
       schemas: new Schemas([
         {
           group: 'metrics',

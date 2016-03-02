@@ -56,10 +56,21 @@ define(function (require) {
       var tooltip;
       var fill = d3.scale.category10();
       var container = svg.append('g');
-      var r1 = Math.min(width-160, height-160) / 2;
-      var innerRadius = Math.min(width-160, height-160) * .41;
-      var outerRadius = innerRadius * 1.1;
-
+      var r1;
+      var innerRadius;
+	  
+	  //variable which holds boolean value to determinte whether show or not to show checkbox
+	  var isChecked = $('#legendCheckbox').is(':checked');
+      
+	  if(isChecked){
+	    var r1 = Math.min(width - 160, height - 160) / 2;
+        var innerRadius = Math.min(width - 160, height - 160) * .41;
+	  } else {
+	    var r1 = height / 2;
+        var innerRadius = Math.min(width, height) * .41;
+	  }
+	  
+	  var outerRadius = innerRadius * 1.1;
       var chord = d3.layout.chord()
         .padding(.05)
         .sortSubgroups(d3.descending)
@@ -115,26 +126,28 @@ define(function (require) {
             .style('opacity', 0);
         });
 
+	  if(isChecked){
       container.append('g')
         .attr('class','chord-text')
         .selectAll('.arc')
         .data(chord.groups)
         .enter().append('svg:text')
         .attr('dy', '.35em')
-        .attr('text-anchor', function(d) { return ((d.startAngle + d.endAngle) / 2) > Math.PI ? 'end' : null; })
-        .attr('transform', function(d) {
+        .attr('text-anchor', function (d) { return ((d.startAngle + d.endAngle) / 2) > Math.PI ? 'end' : null; })
+        .attr('transform', function (d) {
           return 'rotate(' + (((d.startAngle + d.endAngle) / 2) * 180 / Math.PI - 90) + ')'
               + 'translate(' + (r1 - 15) + ')'
               + (((d.startAngle + d.endAngle) / 2) > Math.PI ? 'rotate(180)' : '');
         })
-        .text(function(d) {
-          if (labels[d.index].includes("source")) {
-            return labels[d.index].replace("source","");
-          } else{
-            return labels[d.index].replace("destination","");
+        .text(function (d) {
+          if (labels[d.index].includes('source')) {
+            return labels[d.index].replace('source','');
+          } else {
+            return labels[d.index].replace('destination','');
           }}
         );
- };
+	  };
+    };
 
     /**
      * Remove not unique values from array
@@ -292,7 +305,6 @@ define(function (require) {
     ChordChart.prototype.checkIfEnoughData = function () {
       var series = this.chartData.series;
       var message = 'Chord charts require Source and Destination to be set and this properties must be different ';
-      console.log(series);
       var notEnoughData = series.some(function (obj) {
         return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].x !== obj.values[0].series
         && obj.values[0].y !== null);
@@ -332,7 +344,7 @@ define(function (require) {
             names[0] = d.values[0].aggConfig.vis.aggs[0]._opts.type;
             names[1] = d.values[0].aggConfig.vis.aggs[1]._opts.params.field;
             names[2] = d.values[0].aggConfig.vis.aggs[2]._opts.params.field;
-			names[3] = d.values[0].aggConfig.vis.aggs[1].__schema.title;
+            names[3] = d.values[0].aggConfig.vis.aggs[1].__schema.title;
             var label = d.label;
             return d.values.map(function mapValues(e, i) {
               return {
@@ -346,7 +358,7 @@ define(function (require) {
           width = elWidth - margin.left - margin.right;
           height = elHeight - margin.top - margin.bottom;
 
-          if(names[3] === 'Destination') {
+          if (names[3] === 'Destination') {
             throw new errors.NotEnoughData('Be careful to add Source before Destination! It can confuse you.');
           }
 

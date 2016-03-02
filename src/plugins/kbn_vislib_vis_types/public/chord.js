@@ -10,23 +10,9 @@ define(function (require) {
       description: 'Chord chart displays relationship between group of data in circle view.',
       params: {
         defaults: {
-          shareYAxis: true,
-          addTooltip: true,
-          addLegend: true,
-          showCircles: true,
-          smoothLines: false,
-          interpolate: 'linear',
-          scale: 'linear',
-          drawLinesBetweenPoints: true,
-          radiusRatio: 9,
-          times: [],
-          addTimeMarker: false,
-          defaultYExtents: false,
-          setYExtents: false,
-          yAxis: {}
+          addLegend: true
         },
-        scales: ['linear', 'log', 'square root'],
-        editor: require('plugins/kbn_vislib_vis_types/editors/line.html')
+        editor: require('plugins/kbn_vislib_vis_types/editors/chord.html')
       },
       schemas: new Schemas([
         {

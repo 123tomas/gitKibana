@@ -61,16 +61,22 @@ define(function (require) {
 
       var container = svg.append('g');
       var zoom = d3.behavior.zoom()
-        .scaleExtent([1, 10])
+        .scaleExtent([0.1, 10])
         .on('zoom', zoomed);
-
+      svg.call(zoom);
       //enable graph to be zoomed
       function zoomed() {
         container.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
       }
 
+      container.append('svg:rect')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('fill', 'white');
+
       var force = d3.layout.force()
         .size([width, height])
+		.gravity(.05)
         .charge(-150)
         .linkDistance(50)
         .nodes(nodesObjects)
@@ -81,7 +87,6 @@ define(function (require) {
       links.forEach(function (linkIterated) {
         counts.push(linkIterated.count);
       });
-      svg.call(zoom);
 
       color = d3.scale.category20();
 
@@ -157,35 +162,38 @@ define(function (require) {
       var toggle = 0;
       //Create an array logging what is connected to what
       var linkedByIndex = {};
+      var index = 0;
 
-      for (i = 0; i < nodesObjects.length; i++) {
-        linkedByIndex[i + "," + i] = 1;
-      };
+      nodesObjects.forEach(function (d) {
+        linkedByIndex[index + ',' + index] = 1;
+        index++;
+      });
+
       links.forEach(function (d) {
-        linkedByIndex[d.source.index + "," + d.target.index] = 1;
+        linkedByIndex[d.source.index + ',' + d.target.index] = 1;
       });
 
       //Control up whether a pair are neighbours
       function neighboring(a, b) {
-        return linkedByIndex[a.index + "," + b.index];
+        return linkedByIndex[a.index + ',' + b.index];
       };
 
       function connectedNodes() {
-        if (toggle == 0) {
+        if (toggle === 0) {
           //Reduce the opacity of all but the neighbouring nodes
-          d = d3.select(this).node().__data__;
-          node.style("opacity", function (o) {
+          var d = d3.select(this).node().__data__;
+          node.style('opacity', function (o) {
             return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
           });
-          link.style("opacity", function (o) {
-            return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
+          link.style('opacity', function (o) {
+            return d.index === o.source.index | d.index === o.target.index ? 1 : 0.1;
           });
           //Reduce the op
           toggle = 1;
         } else {
           //Put them back to opacity=1
-          node.style("opacity", 1);
-          link.style("opacity", 1);
+          node.style('opacity', 1);
+          link.style('opacity', 1);
           toggle = 0;
         }
       }
@@ -213,7 +221,7 @@ define(function (require) {
       }
 
       this.addLegend(div, width, height, nodesObjects);
-      
+
     };
 
     /**
@@ -233,13 +241,13 @@ define(function (require) {
      * @method addLegend
      * @param div {HTMLElement} Element to which legend is added
      * @param width,height {number} Width and height to calculate legend width and height
-     * @param nodesObjects {Array} Array of nodes which will be added to legend	 
+     * @param nodesObjects {Array} Array of nodes which will be added to legend
      */
     RelationChart.prototype.addLegend = function (div, width, height, nodesObjects) {
       var legend1 = div.append('div').attr('class','legendClass');
       legend1.style('height',height + 'px');
       legend1.style('width','110x');
-      legend1.style('left', width-130 + 'px')
+      legend1.style('left', width - 130 + 'px');
       legend1.html('<span id="legendButton">Legend</span>');
 
       var legendDiv = legend1.append('div')
@@ -248,7 +256,7 @@ define(function (require) {
 
       var legendSvg = legendDiv.append('svg')
       .attr('class','legendSvg')
-      .attr('height', nodesObjects.length*27)
+      .attr('height', nodesObjects.length * 27)
       .attr('width',130);
 
       var legend = legendSvg.append('g')
@@ -261,17 +269,17 @@ define(function (require) {
       legend.selectAll('g').data(nodesObjects)
       .enter()
       .append('g')
-      .each(function(d, i) {
+      .each(function (d, i) {
         var g = d3.select(this);
         g.append('circle')
           .attr('cx', 5)
-          .attr('cy', i*25+20)
+          .attr('cy', i * 25 + 20)
           .attr('r', 5)
-          .on('mouseover', function() {
+          .on('mouseover', function () {
             var node = document.getElementById(d.name);
             node.style.fill = 'black';
           })
-          .on('mouseout', function() {
+          .on('mouseout', function () {
             var node = document.getElementById(d.name);
             node.style.fill = d.color;
           })
@@ -283,18 +291,18 @@ define(function (require) {
           .attr('height',30)
           .attr('width',100)
           .style('cursor','default')
-          .on('mouseover', function() {
+          .on('mouseover', function () {
             var node = document.getElementById(d.name);
             node.style.fill = 'black';
           })
-          .on('mouseout', function() {
+          .on('mouseout', function () {
             var node = document.getElementById(d.name);
             node.style.fill = d.color;
           })
-          .text(d.name)
+          .text(d.name);
       });
 
-      $('#legendButton').click(function() {
+      $('#legendButton').click(function () {
         $('.legendSvg').toggle();
       });
 
@@ -437,7 +445,7 @@ define(function (require) {
           width = elWidth - margin.left - margin.right;
           height = elHeight - margin.top - margin.bottom;
 
-          if(names[3] === 'Destination') {
+          if (names[3] === 'Destination') {
             throw new errors.NotEnoughData('Be careful to add Source before Destination! It can confuse you.');
           }
 
@@ -448,7 +456,7 @@ define(function (require) {
           div = d3.select(el);
 
           svg = div.append('svg')
-          .attr('width', width + margin.left + margin.right)
+          .attr('width', width + margin.left + margin.right-15)
           .attr('height', height + margin.top + margin.bottom)
           .append('g')
           .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
