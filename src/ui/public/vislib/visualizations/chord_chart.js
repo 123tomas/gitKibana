@@ -225,7 +225,6 @@ define(function (require) {
       data.forEach(function (arrayOfLinks) {
         arrayOfLinks.forEach(function (link) {
           if (link.y !== 0) {
-            console.log(link.y);
             links.push([link.x,link.label,link.y]);
             sourceValues.push(link.x);
             destinationValues.push(link.label);
