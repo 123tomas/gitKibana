@@ -5,7 +5,7 @@ define(function (require) {
     var $ = require('jquery');
     var errors = require('ui/errors');
 
-    var PointSeriesChart = Private(require('ui/vislib/visualizations/_point_series_chart'));
+    var Chart = Private(require('ui/vislib/visualizations/_chart'));
 
     /**
      * Chord Chart Visualization
@@ -17,7 +17,7 @@ define(function (require) {
      * @param el {HTMLElement} HTML element to which the chart will be appended
      * @param chartData {Object} Elasticsearch query results for this specific chart
      */
-    _.class(ChordChart).inherits(PointSeriesChart);
+    _.class(ChordChart).inherits(Chart);
     function ChordChart(handler, chartEl, chartData) {
       if (!(this instanceof ChordChart)) {
         return new ChordChart(handler, chartEl, chartData);
@@ -59,7 +59,7 @@ define(function (require) {
       var r1;
       var innerRadius;
 
-      //variable which holds boolean value to determinte whether show or not to show checkbox
+      //variable which holds boolean value to determinte whether show or not to show legend
       var isChecked = $('#legendCheckbox').is(':checked');
 
       if (isChecked) {
@@ -308,8 +308,7 @@ define(function (require) {
       var series = this.chartData.series;
       var message = 'Chord charts require Source and Destination to be set and this properties must be different ';
       var notEnoughData = series.some(function (obj) {
-        return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].x !== obj.values[0].series
-        && obj.values[0].y !== null);
+        return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].y !== null);
       });
 
       if (notEnoughData) {

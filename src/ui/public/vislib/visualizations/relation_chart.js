@@ -5,7 +5,7 @@ define(function (require) {
     var $ = require('jquery');
     var errors = require('ui/errors');
 
-    var PointSeriesChart = Private(require('ui/vislib/visualizations/_point_series_chart'));
+    var Chart = Private(require('ui/vislib/visualizations/_chart'));
 
     /**
      * Relation Chart Visualization
@@ -17,7 +17,7 @@ define(function (require) {
      * @param el {HTMLElement} HTML element to which the chart will be appended
      * @param chartData {Object} Elasticsearch query results for this specific chart
      */
-    _.class(RelationChart).inherits(PointSeriesChart);
+    _.class(RelationChart).inherits(Chart);
     function RelationChart(handler, chartEl, chartData) {
       if (!(this instanceof RelationChart)) {
         return new RelationChart(handler, chartEl, chartData);
@@ -61,8 +61,9 @@ define(function (require) {
 
       var container = svg.append('g');
       var zoom = d3.behavior.zoom()
-        .scaleExtent([0.1, 10])
+        .scaleExtent([0.6, 10])
         .on('zoom', zoomed);
+
       svg.call(zoom);
       //enable graph to be zoomed
       function zoomed() {
@@ -76,7 +77,6 @@ define(function (require) {
 
       var force = d3.layout.force()
         .size([width, height])
-		.gravity(.05)
         .charge(-150)
         .linkDistance(50)
         .nodes(nodesObjects)
@@ -104,6 +104,7 @@ define(function (require) {
         .attr('stroke', function (d) {
           return scale(d.count);})
         .attr('stroke-width',1)
+        .attr('fill', 'none')
         .on('mouseover', function (d) {
           tooltip.transition()
             .duration(200)
@@ -129,14 +130,14 @@ define(function (require) {
 
       scale = d3.scale.linear()
         .domain([d3.min(counts),d3.max(counts)])
-        .range([5,20]);
+        .range([10,100]);
 
       var node = container.selectAll('.node')
         .data(nodesObjects)
         .enter().append('circle')
         .attr('class', 'node')
         .attr('id', function (d) {return d.name;})
-        .attr('r', function (d) {return scale(d.count);})
+        .attr('r', function (d) {return Math.sqrt(scale(d.count)*Math.PI);})
         .attr('fill',function (d,i) {
           colorAttribute = color(i);
           d.color = colorAttribute;
@@ -160,6 +161,7 @@ define(function (require) {
 
       //setup to ligt up the neighbour nodes on dblclick
       var toggle = 0;
+
       //Create an array logging what is connected to what
       var linkedByIndex = {};
       var index = 0;
@@ -188,7 +190,7 @@ define(function (require) {
           link.style('opacity', function (o) {
             return d.index === o.source.index | d.index === o.target.index ? 1 : 0.1;
           });
-          //Reduce the op
+          //Reduce the opacity
           toggle = 1;
         } else {
           //Put them back to opacity=1
@@ -248,7 +250,7 @@ define(function (require) {
       legend1.style('height',height + 'px');
       legend1.style('width','110x');
       legend1.style('left', width - 130 + 'px');
-      legend1.html('<span id="legendButton">Legend</span>');
+      legend1.html('<span id="legendButton" style= "background-color:white">Legend</span>');
 
       var legendDiv = legend1.append('div')
       .attr('class', 'legendDiv')
@@ -392,11 +394,11 @@ define(function (require) {
      */
     RelationChart.prototype.checkIfEnoughData = function () {
       var series = this.chartData.series;
-      var message = 'Relation charts require Source and Destination to be set and this properties must be different ';
+      var message = 'Relation charts require Source and Destination to be set';
 
       var notEnoughData = series.some(function (obj) {
-        return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].x !== obj.values[0].series
-        && obj.values[0].y !== null);
+		if (obj.values[0].x === obj.values[0].series) throw new errors.NotEnoughData("Your data contain reflexive relationship. Try to use Chord chart");
+        return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].y !== null);
       });
 
       if (notEnoughData) {
