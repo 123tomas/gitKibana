@@ -62,6 +62,7 @@ define(function (require) {
       //variable which holds boolean value to determinte whether show or not to show legend
       var isChecked = $('#legendCheckbox').is(':checked');
 
+      //setting size of diagram due to legend
       if (isChecked) {
         r1 = Math.min(width - 160, height - 160) / 2;
         innerRadius = Math.min(width - 160, height - 160) * .41;
@@ -71,17 +72,21 @@ define(function (require) {
       }
 
       var outerRadius = innerRadius * 1.1;
+      
+      //setting chord layout
       var chord = d3.layout.chord()
         .padding(.05)
         .sortSubgroups(d3.descending)
         .matrix(matrix);
 
-      tooltip = div.append('div')
+	  //setting tooltip properties
+      var tooltip = div.append('div')
         .attr('class', 'tooltip-relation')
         .style('opacity', 0);
 
       container.attr('transform', 'translate(' + (width) / 2 + ',' + (height) / 2 + ')');
 
+	  //drawring outer parts of diagram
       container.append('g').selectAll('path')
         .data(chord.groups)
         .enter().append('path')
@@ -90,8 +95,8 @@ define(function (require) {
           return labels[d.index].includes('destination') ? '#444444' : fill(d.index);
         })
         .attr('d', d3.svg.arc().innerRadius(innerRadius).outerRadius(outerRadius))
-        .on('mouseover', self.fade(.05, true, svg, labels, tooltip, names))
-        .on('mouseout', self.fade(.8, false, svg, labels, tooltip, names));
+        .on('mouseover', self.fade(.05, true, svg, labels, tooltip, names, 'arc'))
+        .on('mouseout', self.fade(.8, false, svg, labels, tooltip, names, 'arc'));
 
       container.append('g')
         .attr('class', 'chord')
@@ -101,31 +106,8 @@ define(function (require) {
         .attr('d', d3.svg.chord().radius(innerRadius))
         .style('fill', function (d) { return fill(d.source.index); })
         .style('opacity',0.8)
-        .on('mouseover', function (d) {
-          svg.selectAll('.chord path')
-            .filter(function (b) { return b.source.index !== d.source.index || b.target.index !== d.target.index; })
-            .transition()
-            .style('opacity', 0.1);
-          tooltip.transition()
-            .duration(200)
-            .style('opacity', .9);
-          tooltip.html('<div class="source"><strong>Source&nbsp(' + names[1] + '):&nbsp</strong>'
-          + labels[d.source.index].replace('source','') + '</div>'
-          + '<div class="target"><strong>Destination&nbsp(' + names[2] + '):&nbsp</strong>'
-          + labels[d.target.index].replace('destination','') + '</div>'
-          + '<div class="count"><strong>' + names[0] + ':&nbsp</strong>' + d.source.value + '</div>');
-          tooltip.style('left', (d3.event.pageX) + 'px')
-            .style('top', (d3.event.pageY) + 'px');
-        })
-        .on('mouseout', function (d) {
-          svg.selectAll('.chord path')
-            .transition()
-            .style('opacity', 0.8);
-          tooltip.transition()
-            .duration(200)
-            .style('opacity', 0);
-        });
-
+        .on('mouseover', self.fade(.05, true, svg, labels, tooltip, names, 'chord'))
+        .on('mouseout', self.fade(.08, false, svg, labels, tooltip, names, 'chord'))
       if (isChecked) {
         container.append('g')
           .attr('class','chord-text')
@@ -160,7 +142,7 @@ define(function (require) {
     };
 
     /**
-     * Fade HTML element on mouse over/out
+     * Fade HTML element on mouse over/out and render a tooltip
      * @method fade
      * @param opacity{Number} opacity which will be set to tooltip
      * @param visible{Boolean} says whether tooltip is visible or not
@@ -168,36 +150,66 @@ define(function (require) {
      * @param tooltip {HTMLElement} Tooltip to which data are written
      * @param labels {Array} Array of names of data
      * @param names {Array} Array of names of group of data
+	 * @param part {string} name of part of diagram which will be faded
      */
-    ChordChart.prototype.fade = function (opacity, visible, svg, labels, tooltip, names) {
+    ChordChart.prototype.fade = function (opacity, visible, svg, labels, tooltip, names, part) {
       return function (g, i) {
-        svg.selectAll('.chord path')
-          .filter(function (b) { return b.source.index !== i && b.target.index !== i; })
-          .transition()
-          .style('opacity', opacity);
-        var text = labels[i];
-        var isSource = false;
-        if (text.includes('source')) {
-          isSource = true;
-        };
-        if (isSource) {
-          text = text.replace('source','');
-          text = '<strong>Source&nbsp(' + names[1] + '):&nbsp</strong>' + text;
+        if(part === 'arc'){
+          svg.selectAll('.chord path')
+            .filter(function (b) { return b.source.index !== i && b.target.index !== i; })
+            .transition()
+            .style('opacity', opacity);
+          var text = labels[i];
+          var isSource = false;
+          
+          if (text.includes('source')) {
+            isSource = true;
+          };
+         
+         if (isSource) {
+            text = text.replace('source','');
+            text = '<strong>Source&nbsp(' + names[1] + '):&nbsp</strong>' + text;
+          }else {
+            text = text.replace('destination','');
+            text = '<strong>Destination&nbsp(' + names[2] + '):&nbsp</strong>' + text;
+          }
+          
+          if (visible) {
+            tooltip.transition()
+              .duration(200)
+              .style('opacity', .9);
+            tooltip.html('<div class="ip">' + text + '</div>');
+            tooltip.style('left', (d3.event.pageX) + 'px')
+              .style('top', (d3.event.pageY) + 'px');
+          }else {
+            tooltip.transition()
+              .duration(200)
+              .style('opacity', 0);
+          }
         }else {
-          text = text.replace('destination','');
-          text = '<strong>Destination&nbsp(' + names[2] + '):&nbsp</strong>' + text;
-        }
-        if (visible) {
+          svg.selectAll('.chord path')
+            .filter(function (b) { return b.source.index !== g.source.index || b.target.index !== g.target.index; })
+            .transition()
+            .style('opacity', 0.1);
           tooltip.transition()
             .duration(200)
             .style('opacity', .9);
-          tooltip.html('<div class="ip">' + text + '</div>');
+          tooltip.html('<div class="source"><strong>Source&nbsp(' + names[1] + '):&nbsp</strong>'
+          + labels[g.source.index].replace('source','') + '</div>'
+          + '<div class="target"><strong>Destination&nbsp(' + names[2] + '):&nbsp</strong>'
+          + labels[g.target.index].replace('destination','') + '</div>'
+          + '<div class="count"><strong>' + names[0] + ':&nbsp</strong>' + g.source.value + '</div>');
           tooltip.style('left', (d3.event.pageX) + 'px')
             .style('top', (d3.event.pageY) + 'px');
-        }else {
-          tooltip.transition()
-            .duration(200)
-            .style('opacity', 0);
+
+          if(!visible){
+            svg.selectAll('.chord path')
+              .transition()
+              .style('opacity', 0.8);
+            tooltip.transition()
+              .duration(200)
+              .style('opacity', 0);
+          }
         }
       };
     };

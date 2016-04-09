@@ -51,16 +51,16 @@ define(function (require) {
       var self = this;
       var scale;
       var parsedData = self.parseData(data);
-      var nodes = parsedData[0];
-      var nodesObjects = parsedData[1];
-      var links = parsedData[2];
+      var nodesObjects = parsedData[0];
+      var links = parsedData[1];
       var counts = [];
       var color;
       var colorAttribute;
       var tooltip;
-
       var container = svg.append('g');
-      var zoom = d3.behavior.zoom()
+      
+	  //variable for setting zoom possibility
+	  var zoom = d3.behavior.zoom()
         .scaleExtent([0.6, 10])
         .on('zoom', zoomed);
 
@@ -69,12 +69,14 @@ define(function (require) {
       function zoomed() {
         container.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
       }
-
+	  
+	  //append rectange on a background for zooming
       container.append('svg:rect')
         .attr('width', width)
         .attr('height', height)
         .attr('fill', 'white');
 
+	  //seting force layout
       var force = d3.layout.force()
         .size([width, height])
         .charge(-150)
@@ -94,10 +96,12 @@ define(function (require) {
       .attr('class', 'tooltip-relation')
       .style('opacity', 0);
 
+	  //setting scaling of links
       scale = d3.scale.linear()
         .domain([d3.min(counts),d3.max(counts)])
         .range(['#d1d1d1', '#000000']);
 
+	  //links drawing
       var link = container.selectAll('.link')
         .data(links)
         .enter().append('svg:path')
@@ -131,13 +135,14 @@ define(function (require) {
       scale = d3.scale.linear()
         .domain([d3.min(counts),d3.max(counts)])
         .range([10,100]);
-
+		
+	  //nodes drawing
       var node = container.selectAll('.node')
         .data(nodesObjects)
         .enter().append('circle')
         .attr('class', 'node')
         .attr('id', function (d) {return d.name;})
-        .attr('r', function (d) {return Math.sqrt(scale(d.count)*Math.PI);})
+        .attr('r', function (d) {return Math.sqrt(scale(d.count) * Math.PI);})
         .attr('fill',function (d,i) {
           colorAttribute = color(i);
           d.color = colorAttribute;
@@ -159,7 +164,7 @@ define(function (require) {
         })
         .on('click', connectedNodes); //Added cod
 
-      //setup to ligt up the neighbour nodes on dblclick
+      //This part setup ligting up the neighbour nodes on dblclick
       var toggle = 0;
 
       //Create an array logging what is connected to what
@@ -200,6 +205,7 @@ define(function (require) {
         }
       }
 
+	  //Position of nodes and links changes
       force.on('tick', function () {
         link.attr('d', function (d) {
           var dx = d.target.x - d.source.x;
@@ -355,7 +361,7 @@ define(function (require) {
         link1.target = nodes.indexOf(link1.target);
 
       });
-      return [nodes,nodesObjects,links];
+      return [nodesObjects,links];
     };
 
     /**
@@ -397,7 +403,8 @@ define(function (require) {
       var message = 'Relation charts require Source and Destination to be set';
 
       var notEnoughData = series.some(function (obj) {
-		if (obj.values[0].x === obj.values[0].series) throw new errors.NotEnoughData("Your data contain reflexive relationship. Try to use Chord chart");
+        if (obj.values[0].x === obj.values[0].series) {throw new errors.NotEnoughData('Your data contain reflexive'
+        + 'relationship. Try to use Chord chart');};
         return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].y !== null);
       });
 
