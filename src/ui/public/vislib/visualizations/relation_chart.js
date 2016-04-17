@@ -58,25 +58,30 @@ define(function (require) {
       var colorAttribute;
       var tooltip;
       var container = svg.append('g');
-      
-	  //variable for setting zoom possibility
-	  var zoom = d3.behavior.zoom()
-        .scaleExtent([0.6, 10])
-        .on('zoom', zoomed);
 
-      svg.call(zoom);
-      //enable graph to be zoomed
-      function zoomed() {
-        container.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
-      }
-	  
-	  //append rectange on a background for zooming
-      container.append('svg:rect')
-        .attr('width', width)
-        .attr('height', height)
-        .attr('fill', 'white');
+      //variable for setting zoom possibility - zoom have to be switched of if static nodes are enable
+      var isChecked = $('#zoomCheckbox').is(':checked');
 
-	  //seting force layout
+      //zoom is possible only if user wants
+      if(isChecked){
+        var zoom = d3.behavior.zoom()
+          .scaleExtent([0.6, 10])
+          .on('zoom', zoomed);
+
+        svg.call(zoom);
+        //enable graph to be zoomed
+        function zoomed() {
+          container.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
+        }
+
+        //append rectange on a background for zooming
+        container.append('svg:rect')
+          .attr('width', width)
+          .attr('height', height)
+          .attr('fill', 'white');
+      };
+
+      //seting force layout
       var force = d3.layout.force()
         .size([width, height])
         .charge(-150)
@@ -85,6 +90,14 @@ define(function (require) {
         .links(links)
         .start();
 
+      // enable static nodes on drag
+      var drag = force.drag()
+        .on("dragstart", dragstart);
+
+      function dragstart(d) {
+        d3.select(this).classed("fixed", d.fixed = true);
+      }
+      
       //loading count of links to count max and min to scale it
       links.forEach(function (linkIterated) {
         counts.push(linkIterated.count);
@@ -96,12 +109,12 @@ define(function (require) {
       .attr('class', 'tooltip-relation')
       .style('opacity', 0);
 
-	  //setting scaling of links
+      //setting scaling of links
       scale = d3.scale.linear()
         .domain([d3.min(counts),d3.max(counts)])
         .range(['#d1d1d1', '#000000']);
 
-	  //links drawing
+      //links drawing
       var link = container.selectAll('.link')
         .data(links)
         .enter().append('svg:path')
@@ -135,8 +148,8 @@ define(function (require) {
       scale = d3.scale.linear()
         .domain([d3.min(counts),d3.max(counts)])
         .range([10,100]);
-		
-	  //nodes drawing
+
+      //nodes drawing
       var node = container.selectAll('.node')
         .data(nodesObjects)
         .enter().append('circle')
@@ -148,7 +161,6 @@ define(function (require) {
           d.color = colorAttribute;
           return colorAttribute;
         })
-        .call(force.drag)
         .on('mouseover', function (d) {
           tooltip.transition()
             .duration(200)
@@ -162,7 +174,8 @@ define(function (require) {
             .duration(200)
             .style('opacity', 0);
         })
-        .on('click', connectedNodes); //Added cod
+      .on("dblclick", connectedNodes)
+      .call(drag);
 
       //This part setup ligting up the neighbour nodes on dblclick
       var toggle = 0;
@@ -205,7 +218,7 @@ define(function (require) {
         }
       }
 
-	  //Position of nodes and links changes
+      //Position of nodes and links changes
       force.on('tick', function () {
         link.attr('d', function (d) {
           var dx = d.target.x - d.source.x;

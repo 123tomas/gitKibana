@@ -72,21 +72,21 @@ define(function (require) {
       }
 
       var outerRadius = innerRadius * 1.1;
-      
+
       //setting chord layout
       var chord = d3.layout.chord()
         .padding(.05)
         .sortSubgroups(d3.descending)
         .matrix(matrix);
 
-	  //setting tooltip properties
+      //setting tooltip properties
       var tooltip = div.append('div')
         .attr('class', 'tooltip-relation')
         .style('opacity', 0);
 
       container.attr('transform', 'translate(' + (width) / 2 + ',' + (height) / 2 + ')');
 
-	  //drawring outer parts of diagram
+      //drawring outer parts of diagram
       container.append('g').selectAll('path')
         .data(chord.groups)
         .enter().append('path')
@@ -107,7 +107,7 @@ define(function (require) {
         .style('fill', function (d) { return fill(d.source.index); })
         .style('opacity',0.8)
         .on('mouseover', self.fade(.05, true, svg, labels, tooltip, names, 'chord'))
-        .on('mouseout', self.fade(.08, false, svg, labels, tooltip, names, 'chord'))
+        .on('mouseout', self.fade(.08, false, svg, labels, tooltip, names, 'chord'));
       if (isChecked) {
         container.append('g')
           .attr('class','chord-text')
@@ -150,30 +150,30 @@ define(function (require) {
      * @param tooltip {HTMLElement} Tooltip to which data are written
      * @param labels {Array} Array of names of data
      * @param names {Array} Array of names of group of data
-	 * @param part {string} name of part of diagram which will be faded
+     * @param part {string} name of part of diagram which will be faded
      */
     ChordChart.prototype.fade = function (opacity, visible, svg, labels, tooltip, names, part) {
       return function (g, i) {
-        if(part === 'arc'){
+        if (part === 'arc') {
           svg.selectAll('.chord path')
             .filter(function (b) { return b.source.index !== i && b.target.index !== i; })
             .transition()
             .style('opacity', opacity);
           var text = labels[i];
           var isSource = false;
-          
+
           if (text.includes('source')) {
             isSource = true;
           };
-         
-         if (isSource) {
+
+          if (isSource) {
             text = text.replace('source','');
             text = '<strong>Source&nbsp(' + names[1] + '):&nbsp</strong>' + text;
           }else {
             text = text.replace('destination','');
             text = '<strong>Destination&nbsp(' + names[2] + '):&nbsp</strong>' + text;
           }
-          
+
           if (visible) {
             tooltip.transition()
               .duration(200)
@@ -202,7 +202,7 @@ define(function (require) {
           tooltip.style('left', (d3.event.pageX) + 'px')
             .style('top', (d3.event.pageY) + 'px');
 
-          if(!visible){
+          if (!visible) {
             svg.selectAll('.chord path')
               .transition()
               .style('opacity', 0.8);

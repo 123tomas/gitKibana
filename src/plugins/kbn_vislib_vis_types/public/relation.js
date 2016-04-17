@@ -8,6 +8,12 @@ define(function (require) {
       title: 'Relation chart',
       icon: 'fa-compress',
       description: 'Relation chart allows you to draw easy relations between nodes.',
+      params: {
+        defaults: {
+          zoom: true
+        },
+        editor: require('plugins/kbn_vislib_vis_types/editors/relation.html')
+      },
       schemas: new Schemas([
         {
           group: 'metrics',
