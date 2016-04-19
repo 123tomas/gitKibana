@@ -5,8 +5,7 @@ define(function (require) {
     var Data = Private(require('ui/vislib/lib/data'));
 
     /*
-     * Create handlers for Area, Column, and Line charts which
-     * are all nearly the same minus a few details
+     * Create handlers for Relation chart and
      */
     return function (vis) {
       var data;

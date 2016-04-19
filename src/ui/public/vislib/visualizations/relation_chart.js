@@ -63,7 +63,7 @@ define(function (require) {
       var isChecked = $('#zoomCheckbox').is(':checked');
 
       //zoom is possible only if user wants
-      if(isChecked){
+      if (isChecked) {
         var zoom = d3.behavior.zoom()
           .scaleExtent([0.6, 10])
           .on('zoom', zoomed);
@@ -92,12 +92,12 @@ define(function (require) {
 
       // enable static nodes on drag
       var drag = force.drag()
-        .on("dragstart", dragstart);
+        .on('dragstart', dragstart);
 
       function dragstart(d) {
-        d3.select(this).classed("fixed", d.fixed = true);
+        d3.select(this).classed('fixed', d.fixed = true);
       }
-      
+
       //loading count of links to count max and min to scale it
       links.forEach(function (linkIterated) {
         counts.push(linkIterated.count);
@@ -174,7 +174,7 @@ define(function (require) {
             .duration(200)
             .style('opacity', 0);
         })
-      .on("dblclick", connectedNodes)
+      .on('dblclick', connectedNodes)
       .call(drag);
 
       //This part setup ligting up the neighbour nodes on dblclick
