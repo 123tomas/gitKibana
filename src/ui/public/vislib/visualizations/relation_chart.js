@@ -293,6 +293,7 @@ define(function (require) {
       .each(function (d, i) {
         var g = d3.select(this);
         g.append('circle')
+          .attr('class', 'node')
           .attr('cx', 5)
           .attr('cy', i * 25 + 20)
           .attr('r', 5)
