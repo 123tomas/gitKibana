@@ -16,7 +16,8 @@ define(function (require) {
       chord: Private(require('ui/vislib/visualizations/chord_chart')),
       area: Private(require('ui/vislib/visualizations/area_chart')),
       tile_map: Private(require('ui/vislib/visualizations/tile_map')),
-      relation: Private(require('ui/vislib/visualizations/relation_chart'))
+      relation: Private(require('ui/vislib/visualizations/relation_chart')),
+	  spider: Private(require('ui/vislib/visualizations/spider_chart'))
     };
   };
 });

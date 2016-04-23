@@ -7,4 +7,5 @@ define(function (require) {
   visTypes.register(require('plugins/kbn_vislib_vis_types/tileMap'));
   visTypes.register(require('plugins/kbn_vislib_vis_types/chord'));
   visTypes.register(require('plugins/kbn_vislib_vis_types/relation'));
+  visTypes.register(require('plugins/kbn_vislib_vis_types/spider'));
 });

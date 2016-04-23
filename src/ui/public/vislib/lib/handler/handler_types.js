@@ -16,6 +16,7 @@ define(function (require) {
       area: pointSeries.area,
       tile_map: Private(require('ui/vislib/lib/handler/types/tile_map')),
       relation: Private(require('ui/vislib/lib/handler/types/relation')),
+	  spider: Private(require('ui/vislib/lib/handler/types/relation'))
     };
   };
 });
