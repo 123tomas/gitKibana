@@ -17,7 +17,7 @@ define(function (require) {
       tile_map: Private(require('ui/vislib/lib/layout/types/map_layout')),
       chord: Private(require('ui/vislib/lib/layout/types/relation_layout')),
       relation: Private(require('ui/vislib/lib/layout/types/relation_layout')),
-	  spider: Private(require('ui/vislib/lib/layout/types/relation_layout'))
+      spider: Private(require('ui/vislib/lib/layout/types/relation_layout'))
     };
   };
 });

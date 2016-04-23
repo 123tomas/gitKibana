@@ -17,7 +17,7 @@ define(function (require) {
       area: Private(require('ui/vislib/visualizations/area_chart')),
       tile_map: Private(require('ui/vislib/visualizations/tile_map')),
       relation: Private(require('ui/vislib/visualizations/relation_chart')),
-	  spider: Private(require('ui/vislib/visualizations/spider_chart'))
+      spider: Private(require('ui/vislib/visualizations/spider_chart'))
     };
   };
 });

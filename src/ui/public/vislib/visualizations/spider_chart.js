@@ -4,7 +4,7 @@ define(function (require) {
     var _ = require('lodash');
     var $ = require('jquery');
     var errors = require('ui/errors');
-	var color = d3.scale.category10();
+    var color = d3.scale.category10();
 
     var Chart = Private(require('ui/vislib/visualizations/_chart'));
 
@@ -46,7 +46,7 @@ define(function (require) {
      * @param width, height {number} width and height of new svg element
      * @returns {D3.UpdateSelection} SVG with force layered graph added
     */
-   SpiderChart.prototype.addSpiderGraph = function (svg, div, data, width, height) {
+    SpiderChart.prototype.addSpiderGraph = function (svg, div, data, width, height) {
       var radius = 5;
       var w = Math.min(width,height) - 120;
       var h = Math.min(width,height) - 120;
@@ -57,42 +57,48 @@ define(function (require) {
       var radians = 2 * Math.PI;
       var opacityArea = 0.2;
       var ToRight = 0;
-      var TranslateX = Math.min(width,height)/4
+      var TranslateX = Math.min(width,height) / 4;
       var TranslateY = 50;
       var ExtraWidthX = 200;
       var ExtraWidthY = 100;
       var d = this.parseData(data)[1];
-      maxValue = Math.max(maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
-      var allAxis = (d[0].map(function(i, j){return i.axis}));
+      maxValue = Math.max(maxValue, d3.max(d, function (i) {return d3.max(i.map(function (o) {return o.value;}));}));
+      var allAxis = (d[0].map(function (i, j) {return i.axis;}));
       var total = allAxis.length;
-      var radius = factor*Math.min(w/2, h/2);
+      var radius = factor * Math.min(w / 2, h / 2);
 
       var g = svg.append('g')
         .attr('transform', 'translate(' + TranslateX + ',' + TranslateY + ')');
 
       var tooltip;
-
-      //Circular segments
+      var levelsArray = [];
       var j = 0;
-      while (j<levels-1) {
-        var levelFactor = factor*radius*((j+1)/levels);
+      while (j < (levels - 1)) {
+        levelsArray.push(1);
+        j++;
+      }
+      console.log(levelsArray);
+      //Circular segments
+      j = 0;
+      levelsArray.forEach(function (number){
+        var levelFactor = factor * radius * ((j + 1) / levels);
         g.selectAll('.levels')
          .data(allAxis)
          .enter()
          .append('svg:line')
-         .attr('x1', function(d, i){return levelFactor*(1-factor*Math.sin(i*radians/total));})
-         .attr('y1', function(d, i){return levelFactor*(1-factor*Math.cos(i*radians/total));})
-         .attr('x2', function(d, i){return levelFactor*(1-factor*Math.sin((i+1)*radians/total));})
-         .attr('y2', function(d, i){return levelFactor*(1-factor*Math.cos((i+1)*radians/total));})
-         .attr('class', 'line')
+         .attr('x1', function (d, i) {return levelFactor * (1 - factor * Math.sin(i * radians / total));})
+         .attr('y1', function (d, i) {return levelFactor * (1 - factor * Math.cos(i * radians / total));})
+         .attr('x2', function (d, i) {return levelFactor * (1 - factor * Math.sin((i + 1) * radians / total));})
+         .attr('y2', function (d, i) {return levelFactor * (1 - factor * Math.cos((i + 1) * radians / total));})
+         .attr('class', 'lines')
          .style('stroke', 'grey')
          .style('stroke-opacity', '0.75')
          .style('stroke-width', '0.3px')
-         .attr('transform', 'translate(' + (w/2-levelFactor) + ', ' + (h/2-levelFactor) + ')');
+         .attr('transform', 'translate(' + (w / 2 - levelFactor) + ', ' + (h / 2 - levelFactor) + ')');
         j++;
-     }
+      });
 
-      series = 0;
+      var series = 0;
 
       var axis = g.selectAll('.axis')
         .data(allAxis)
@@ -101,33 +107,34 @@ define(function (require) {
         .attr('class', 'axis');
 
       axis.append('line')
-        .attr('x1', w/2)
-        .attr('y1', h/2)
-        .attr('x2', function(d, i){return (w)/2*(1-(factor-0.1)*Math.sin(i*radians/total));})
-        .attr('y2', function(d, i){return (h)/2*(1-(factor-0.1)*Math.cos(i*radians/total));})
+        .attr('x1', w / 2)
+        .attr('y1', h / 2)
+        .attr('x2', function (d, i) {return (w) / 2 * (1 - (factor - 0.1) * Math.sin(i * radians / total));})
+        .attr('y2', function (d, i) {return (h) / 2 * (1 - (factor - 0.1) * Math.cos(i * radians / total));})
         .attr('class', 'line')
         .style('stroke', 'grey')
         .style('stroke-width', '1px');
 
       axis.append('text')
         .attr('class', 'legend')
-        .text(function(d){return d})
+        .text(function (d) {return d;})
         .style('font-family', 'sans-serif')
         .style('font-size', '11px')
         .attr('text-anchor', 'middle')
         .attr('dy', '1.5em')
-        .attr('transform', function(d, i){return 'translate(0, -10)'})
-        .attr('x', function(d, i){return w/2*(1-factorLegend*Math.sin(i*radians/total))-60*Math.sin(i*radians/total);})
-        .attr('y', function(d, i){return h/2*(1-Math.cos(i*radians/total))-20*Math.cos(i*radians/total);});
+        .attr('transform', function (d, i) {return 'translate(0, -10)';})
+        .attr('x', function (d, i) {return w / 2 * (1 -
+          factorLegend * Math.sin(i * radians / total)) - 60 * Math.sin(i * radians / total);})
+        .attr('y', function (d, i) {return h / 2 * (1 - Math.cos(i * radians / total)) - 20 * Math.cos(i * radians / total);});
 
 
-      d.forEach(function(y, x){
-        dataValues = [];
+      d.forEach(function (y, x) {
+        var dataValues = [];
         g.selectAll('.nodes')
-          .data(y, function(j, i){
+          .data(y, function (j, i) {
             dataValues.push([
-              w/2*(1-(parseFloat(Math.max(j.value, 0))/maxValue)*factor*Math.sin(i*radians/total)), 
-              h/2*(1-(parseFloat(Math.max(j.value, 0))/maxValue)*factor*Math.cos(i*radians/total))
+              w / 2 * (1 - (parseFloat(Math.max(j.value, 0)) / maxValue) * factor * Math.sin(i * radians / total)),
+              h / 2 * (1 - (parseFloat(Math.max(j.value, 0)) / maxValue) * factor * Math.cos(i * radians / total))
             ]);
           });
         dataValues.push(dataValues[0]);
@@ -139,26 +146,26 @@ define(function (require) {
           .attr('id', 'radar-chart-serie' + series)
           .style('stroke-width', '0px')
           .style('stroke', color(series))
-          .attr('points',function(d) {
-            var str='';
+          .attr('points',function (d) {
+            var str = '';
             d.forEach(function (pti) {
-              str=str + pti[0] + ',' + pti[1] + ' ';
+              str = str + pti[0] + ',' + pti[1] + ' ';
             });
             return str;
           })
-          .style('fill', function(j, i){return color(series)})
+          .style('fill', function (j, i) {return color(series);})
           .style('fill-opacity', opacityArea)
-          .on('mouseover', function (d){
-            z = 'polygon.'+d3.select(this).attr('class');
+          .on('mouseover', function (d) {
+            var z = 'polygon.' + d3.select(this).attr('class');
             g.selectAll('polygon')
               .transition(200)
-              .style('fill-opacity', 0.1); 
+              .style('fill-opacity', 0.1);
 
             g.selectAll(z)
               .transition(200)
               .style('fill-opacity', 0.9);
           })
-          .on('mouseout', function(){
+          .on('mouseout', function () {
             g.selectAll('polygon')
             .transition(200)
             .style('fill-opacity', opacityArea);
@@ -166,25 +173,26 @@ define(function (require) {
         series++;
       });
 
-      series=0;
+      series = 0;
 
-      d.forEach(function(y, x){
+      d.forEach(function (y, x) {
         g.selectAll('.nodes')
           .data(y).enter()
           .append('svg:circle')
           .attr('r', '5px')
-          .attr('cx', function(j, i){
+          .attr('cx', function (j, i) {
+            var dataValues = [];
             dataValues.push([
-              w/2*(1-(parseFloat(Math.max(j.value, 0))/maxValue)*factor*Math.sin(i*radians/total)), 
-              h/2*(1-(parseFloat(Math.max(j.value, 0))/maxValue)*factor*Math.cos(i*radians/total))
+              w / 2 * (1 - (parseFloat(Math.max(j.value, 0)) / maxValue) * factor * Math.sin(i * radians / total)),
+              h / 2 * (1 - (parseFloat(Math.max(j.value, 0)) / maxValue) * factor * Math.cos(i * radians / total))
             ]);
-            return w/2*(1-(Math.max(j.value, 0)/maxValue)*factor*Math.sin(i*radians/total));
+            return w / 2 * (1 - (Math.max(j.value, 0) / maxValue) * factor * Math.sin(i * radians / total));
           })
-          .attr('cy', function(j, i){
-            return h/2*(1-(Math.max(j.value, 0)/maxValue)*factor*Math.cos(i*radians/total));
+          .attr('cy', function (j, i) {
+            return h / 2 * (1 - (Math.max(j.value, 0) / maxValue) * factor * Math.cos(i * radians / total));
           })
           .style('fill', color(series)).style('fill-opacity', .9)
-          .on('mouseover', function (d){
+          .on('mouseover', function (d) {
             tooltip.transition()
               .duration(200)
               .style('opacity', .9);
@@ -192,15 +200,15 @@ define(function (require) {
             tooltip.style('left', (d3.event.pageX) + 'px')
               .style('top', (d3.event.pageY) + 'px');
 
-            z = 'polygon.'+d3.select(this).attr('class');
+            var z = 'polygon.' + d3.select(this).attr('class');
             g.selectAll('polygon')
               .transition(200)
-              .style('fill-opacity', 0.1); 
+              .style('fill-opacity', 0.1);
             g.selectAll(z)
               .transition(200)
               .style('fill-opacity', .7);
           })
-          .on('mouseout', function(){
+          .on('mouseout', function () {
             tooltip.transition(200)
               .style('opacity', 0);
             g.selectAll('polygon')
@@ -221,7 +229,7 @@ define(function (require) {
       //Legend titles
       var legendOptions = this.parseData(data)[0];
 
-      this.addLegend(div,width,height,legendOptions)
+      this.addLegend(div,width,height,legendOptions);
 
     };
 
@@ -268,8 +276,8 @@ define(function (require) {
             .attr('class', 'node')
             .attr('cy', i * 25 + 20)
             .attr('r', 5)
-            .attr('id', function(){series++; return 'radar-chart-serie'+series})
-            .style('fill', function(j, i){return color(series)})
+            .attr('id', function () {series++; return 'radar-chart-serie' + series;})
+            .style('fill', function (j, i) {return color(series);})
             .on('mouseover', function () {
               var area = document.getElementById(this.id);
               area.style.fillOpacity = 1;
@@ -278,26 +286,25 @@ define(function (require) {
              var area = document.getElementById(this.id);
              area.style.fillOpacity = 0.1;
            });
-        g.append('text')
-          .attr('x', 15)
-          .attr('y', i * 25 + 25)
-          .attr('height',30)
-          .attr('width',100)
-          .style('cursor','default')
-          .attr('id', function(){return 'radar-chart-serie'+series})
-          .on('mouseover', function () {
-            var area = document.getElementById(this.id);
-            area.style.fillOpacity = 1;
-          })
-         .on('mouseout', function () {
-           var area = document.getElementById(this.id);
-            area.style.fillOpacity = 0.1;
-          })
-          .text(d);
-      });
-};
+          g.append('text')
+            .attr('x', 15)
+            .attr('y', i * 25 + 25)
+            .attr('height',30)
+            .attr('width',100)
+            .style('cursor','default')
+            .attr('id', function () {return 'radar-chart-serie' + series;})
+            .on('mouseover', function () {
+              var area = document.getElementById(this.id);
+              area.style.fillOpacity = 1;
+            })
+           .on('mouseout', function () {
+             var area = document.getElementById(this.id);
+             area.style.fillOpacity = 0.1;
+           })
+           .text(d);
+        });
+    };
 
-    
     /**
      * Parse data into form suitable form force layered graph
      *
@@ -315,60 +322,60 @@ define(function (require) {
       var i = 0;
       var final = [];
 
-      data.forEach(function(array) {
-        axis.push(array[0].label)
+      data.forEach(function (array) {
+        axis.push(array[0].label);
       });
 
-      data[0].forEach(function(obj){
+      data[0].forEach(function (obj) {
         splits.push(obj.x);
         datas.push([]);
-      })
+      });
 
-      data.forEach(function(array) {
+      data.forEach(function (array) {
         i = 0;
-        array.forEach(function(obj){
-          if(obj.y === null)  obj.y = 0;
+        array.forEach(function (obj) {
+          if (obj.y === null)  obj.y = 0;
           datas[i].push(obj.y);
           i++;
-        })
-      })
+        });
+      });
 
-      datas[0].forEach(function(obj) {
+      datas[0].forEach(function (obj) {
         pom.push([]);
         pom2.push([]);
       });
 
-      datas.forEach(function(data){
-        i=0;
-        data.forEach(function(d){
+      datas.forEach(function (data) {
+        i = 0;
+        data.forEach(function (d) {
           pom[i].push(d);
           i++;
-        })
-      });
-
-      i=0;
-      pom.forEach(function(data){
-        scale = d3.scale.linear()
-         .domain([0,d3.max(data)])
-         .range([0.05, 0.9]);
-
-        data.forEach(function(d){
-          pom2[i].push(scale(d));
-        })
-        i++;
+        });
       });
 
       i = 0;
-      j = 0;
-      splits.forEach(function(split){
+      pom.forEach(function (data) {
+        var scale = d3.scale.linear()
+         .domain([0,d3.max(data)])
+         .range([0.05, 0.9]);
+
+        data.forEach(function (d) {
+          pom2[i].push(scale(d));
+        });
+        i++;
+      });
+
+      var i = 0;
+      var j = 0;
+      splits.forEach(function (split) {
         final.push([]);
         j = 0;
-        axis.forEach(function(ax){
-          final[i].push({axis:ax,value:pom2[j][i],valueOrig:pom[j][i]})
+        axis.forEach(function (ax) {
+          final[i].push({axis:ax,value:pom2[j][i],valueOrig:pom[j][i]});
           j++;
-        })
+        });
         i++;
-      })
+      });
 
       if (splits.length > 8) {
         throw new errors.NotEnoughData('Enough splits terms!');
@@ -430,7 +437,7 @@ define(function (require) {
       var margin = this._attr.margin;
       var elWidth = this._attr.width = $elem.width();
       var elHeight = this._attr.height = $elem.height();
-      var minWidth = 400;
+      var minWidth = 500;
       var minHeight = 400;
       var div;
       var svg;

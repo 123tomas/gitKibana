@@ -15,7 +15,7 @@ define(function (require) {
           title: 'Axis',
           min: 1,
           max: 12,
-          aggFilter: ['max','min','avg','count','median','cardinality'],
+          aggFilter: ['max','min','avg','count','median','cardinality','sum'],
           defaults: [
             { schema: 'metric', type: 'count' }
           ]
