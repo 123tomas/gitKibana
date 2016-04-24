@@ -6,7 +6,7 @@ define(function (require) {
     return new VislibVisType({
       name: 'spider',
       title: 'Spider chart',
-      icon: 'fa-support',
+      icon: 'fa-spinner',
       description: 'Spider chart visualize more than three attributes at same time',
       schemas: new Schemas([
         {
@@ -15,7 +15,7 @@ define(function (require) {
           title: 'Axis',
           min: 1,
           max: 12,
-          aggFilter: ['max','min','avg','count','median','cardinality','sum'],
+          aggFilter: ['max','min','avg','count','cardinality','sum'],
           defaults: [
             { schema: 'metric', type: 'count' }
           ]
@@ -26,7 +26,7 @@ define(function (require) {
           title: 'Segments',
           min: 0,
           max: 1,
-          aggFilter: ['terms'],
+          aggFilter: '!geohash_grid',
         },
       ])
     });

@@ -29,6 +29,7 @@ define(function (require) {
         {
           group: 'buckets',
           name: 'segment',
+          icon: 'fa fa-expand',
           title: 'Source',
           min: 1,
           max: 1,
@@ -37,6 +38,7 @@ define(function (require) {
         {
           group: 'buckets',
           name: 'group',
+          icon: 'fa fa-compress',
           title: 'Destination',
           min: 1,
           max: 1,

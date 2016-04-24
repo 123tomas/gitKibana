@@ -57,7 +57,12 @@ define(function (require) {
       var radians = 2 * Math.PI;
       var opacityArea = 0.2;
       var ToRight = 0;
-      var TranslateX = Math.min(width,height) / 4;
+      var TranslateX = 0;
+      if (width < height) {
+        TranslateX = 30;
+      }else{
+        TranslateX = width / 4;
+      }
       var TranslateY = 50;
       var ExtraWidthX = 200;
       var ExtraWidthY = 100;
@@ -77,10 +82,10 @@ define(function (require) {
         levelsArray.push(1);
         j++;
       }
-      console.log(levelsArray);
+
       //Circular segments
       j = 0;
-      levelsArray.forEach(function (number){
+      levelsArray.forEach(function (number) {
         var levelFactor = factor * radius * ((j + 1) / levels);
         g.selectAll('.levels')
          .data(allAxis)
@@ -437,7 +442,7 @@ define(function (require) {
       var margin = this._attr.margin;
       var elWidth = this._attr.width = $elem.width();
       var elHeight = this._attr.height = $elem.height();
-      var minWidth = 500;
+      var minWidth = 700;
       var minHeight = 400;
       var div;
       var svg;

@@ -6,7 +6,7 @@ define(function (require) {
     return new VislibVisType({
       name: 'chord',
       title: 'Chord chart',
-      icon: 'fa-spinner',
+      icon: 'fa-support',
       description: 'Chord chart displays relationship between group of data in circle view.',
       params: {
         defaults: {
@@ -29,6 +29,7 @@ define(function (require) {
         {
           group: 'buckets',
           name: 'segment',
+          icon: 'fa fa-expand',
           title: 'Source',
           min: 1,
           max: 1,
@@ -37,6 +38,7 @@ define(function (require) {
         {
           group: 'buckets',
           name: 'group',
+          icon: 'fa fa-compress',
           title: 'Destination',
           min: 1,
           max: 1,
