@@ -55,12 +55,12 @@ define(function (require) {
       var levels = 10;
       var maxValue = 1;
       var radians = 2 * Math.PI;
-      var opacityArea = 0.2;
+      var opacityArea = 0.35;
       var ToRight = 0;
       var TranslateX = 0;
       if (width < height) {
         TranslateX = 30;
-      }else{
+      } else {
         TranslateX = width / 4;
       }
       var TranslateY = 50;
@@ -211,7 +211,7 @@ define(function (require) {
               .style('fill-opacity', 0.1);
             g.selectAll(z)
               .transition(200)
-              .style('fill-opacity', .7);
+              .style('fill-opacity', .75);
           })
           .on('mouseout', function () {
             tooltip.transition(200)
@@ -285,7 +285,7 @@ define(function (require) {
             .style('fill', function (j, i) {return color(series);})
             .on('mouseover', function () {
               var area = document.getElementById(this.id);
-              area.style.fillOpacity = 1;
+              area.style.fillOpacity = 0.75;
             })
            .on('mouseout', function () {
              var area = document.getElementById(this.id);
@@ -300,7 +300,7 @@ define(function (require) {
             .attr('id', function () {return 'radar-chart-serie' + series;})
             .on('mouseover', function () {
               var area = document.getElementById(this.id);
-              area.style.fillOpacity = 1;
+              area.style.fillOpacity = 0.75;
             })
            .on('mouseout', function () {
              var area = document.getElementById(this.id);
