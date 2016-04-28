@@ -83,7 +83,7 @@ define(function (require) {
         j++;
       }
 
-      //Circular segments
+      //Net axis
       j = 0;
       levelsArray.forEach(function (number) {
         var levelFactor = factor * radius * ((j + 1) / levels);
@@ -105,6 +105,7 @@ define(function (require) {
 
       var series = 0;
 
+      //axis drawing
       var axis = g.selectAll('.axis')
         .data(allAxis)
         .enter()
@@ -132,7 +133,7 @@ define(function (require) {
           factorLegend * Math.sin(i * radians / total)) - 60 * Math.sin(i * radians / total);})
         .attr('y', function (d, i) {return h / 2 * (1 - Math.cos(i * radians / total)) - 20 * Math.cos(i * radians / total);});
 
-
+      //area drawing
       d.forEach(function (y, x) {
         var dataValues = [];
         g.selectAll('.nodes')
@@ -180,6 +181,7 @@ define(function (require) {
 
       series = 0;
 
+      //circles drawing
       d.forEach(function (y, x) {
         g.selectAll('.nodes')
           .data(y).enter()
@@ -278,7 +280,7 @@ define(function (require) {
           var g = d3.select(this);
           g.append('circle')
             .attr('cx', 5)
-            .attr('class', 'nodes')
+            .attr('class', 'node')
             .attr('cy', i * 25 + 20)
             .attr('r', 5)
             .attr('id', function () {series++; return 'radar-chart-serie' + series;})
@@ -289,7 +291,7 @@ define(function (require) {
             })
            .on('mouseout', function () {
              var area = document.getElementById(this.id);
-             area.style.fillOpacity = 0.1;
+             area.style.fillOpacity = 0.35;
            });
           g.append('text')
             .attr('x', 15)
@@ -304,7 +306,7 @@ define(function (require) {
             })
            .on('mouseout', function () {
              var area = document.getElementById(this.id);
-             area.style.fillOpacity = 0.1;
+             area.style.fillOpacity = 0.35;
            })
            .text(d);
         });
