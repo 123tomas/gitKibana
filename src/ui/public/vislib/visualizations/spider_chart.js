@@ -244,7 +244,7 @@ define(function (require) {
      * @method addLegend
      * @param div {HTMLElement} Element to which legend is added
      * @param width,height {number} Width and height to calculate legend width and height
-     * @param nodesObjects {Array} Array of nodes which will be added to legend
+     * @param legendOptions {Array} Legend points
      */
     SpiderChart.prototype.addLegend = function (div, width, height, legendOptions) {
 
@@ -278,7 +278,7 @@ define(function (require) {
           var g = d3.select(this);
           g.append('circle')
             .attr('cx', 5)
-            .attr('class', 'node')
+            .attr('class', 'nodes')
             .attr('cy', i * 25 + 20)
             .attr('r', 5)
             .attr('id', function () {series++; return 'radar-chart-serie' + series;})
