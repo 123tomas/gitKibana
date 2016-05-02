@@ -150,7 +150,7 @@ define(function (require) {
           .append('polygon')
           .attr('class', 'radar-chart-serie' + series)
           .attr('id', 'radar-chart-serie' + series)
-          .style('stroke-width', '0px')
+          .style('stroke-width', '2px')
           .style('stroke', color(series))
           .attr('points',function (d) {
             var str = '';
@@ -360,11 +360,25 @@ define(function (require) {
         });
       });
 
+
       i = 0;
+      if (pom[0].length == 1) {
+        var forScale = [];
+        pom.forEach(function(x){
+          forScale.push(x[0]);
+        })
+      };
+
       pom.forEach(function (data) {
-        var scale = d3.scale.linear()
-         .domain([0,d3.max(data)])
-         .range([0.05, 0.9]);
+        if (pom[0].length === 1) {
+          var scale = d3.scale.linear()
+           .domain([0,d3.max(forScale)])
+           .range([0.05, 0.9]);
+        }else {
+          var scale = d3.scale.linear()
+           .domain([0,d3.max(data)])
+           .range([0.05, 0.9]);
+        };
 
         data.forEach(function (d) {
           pom2[i].push(scale(d));
