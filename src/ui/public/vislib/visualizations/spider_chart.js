@@ -362,20 +362,22 @@ define(function (require) {
 
 
       i = 0;
-      if (pom[0].length == 1) {
-        var forScale = [];
-        pom.forEach(function(x){
+      var forScale;
+      var scale;
+      if (pom[0].length === 1) {
+        forScale = [];
+        pom.forEach(function (x) {
           forScale.push(x[0]);
-        })
+        });
       };
 
       pom.forEach(function (data) {
         if (pom[0].length === 1) {
-          var scale = d3.scale.linear()
+          scale = d3.scale.linear()
            .domain([0,d3.max(forScale)])
            .range([0.05, 0.9]);
         }else {
-          var scale = d3.scale.linear()
+          scale = d3.scale.linear()
            .domain([0,d3.max(data)])
            .range([0.05, 0.9]);
         };
