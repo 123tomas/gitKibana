@@ -244,6 +244,9 @@ define(function (require) {
         });
       });
 
+      if ((sourceValues.length == 0) || (destinationValues.length == 0)){
+        throw new errors.NotEnoughData('Every link is equals to zero - nothing to show.');
+      }
       self.toUnique(sourceValues);
       self.toUnique(destinationValues);
 
@@ -318,7 +321,7 @@ define(function (require) {
      */
     ChordChart.prototype.checkIfEnoughData = function () {
       var series = this.chartData.series;
-      var message = 'Chord charts require Source and Destination to be set and this properties must be different ';
+      var message = 'Chord charts require Source and Destination to be set and this properties must be different and links cannot be null';
       var notEnoughData = series.some(function (obj) {
         return !(obj.values[0].hasOwnProperty('series') && obj.values[0].x !== '_all' && obj.values[0].y !== null);
       });
